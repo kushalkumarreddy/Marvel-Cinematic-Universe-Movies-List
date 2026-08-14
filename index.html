@@ -482,19 +482,25 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   background:var(--bg-elevated);
   border:1px solid var(--border-color);
   border-radius:var(--radius-md);
-  padding:18px 22px;
-  display:flex;
-  align-items:center;
-  gap:22px;
-  transition:border-color var(--transition-med), background var(--transition-med), transform var(--transition-fast);
+  padding:0;
+  transition:border-color var(--transition-med), background var(--transition-med);
   position:relative;
+  cursor:pointer;
 }
 .card:hover{
   border-color:var(--marvel-red);
   background:linear-gradient(90deg, rgba(237,29,36,0.06), transparent 60%), var(--bg-elevated);
-  transform:translateX(4px);
 }
 .card.is-watched{ border-color:rgba(237,29,36,0.35); }
+
+.card-row{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:18px 22px;
+  transition:transform var(--transition-fast);
+}
+.card:hover .card-row{ transform:translateX(4px); }
 
 .card-index{
   font-family:var(--font-mono);
@@ -523,6 +529,37 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
 .unreleased-tag{
   font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
   color:var(--marvel-red); border:1px solid rgba(237,29,36,0.4); padding:2px 8px; border-radius:20px;
+}
+
+.card-chevron{
+  flex-shrink:0;
+  width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-secondary);
+  border:1px solid var(--border-color);
+  transition:transform var(--transition-med), color var(--transition-fast), border-color var(--transition-fast);
+}
+.card-chevron svg{ width:13px; height:13px; }
+.card:hover .card-chevron{ color:var(--marvel-red); border-color:var(--marvel-red); }
+.card.is-expanded .card-chevron{ transform:rotate(180deg); }
+
+.card-desc-wrap{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 380ms var(--ease), padding var(--transition-med);
+  padding:0 22px;
+}
+.card.is-expanded .card-desc-wrap{
+  max-height:160px;
+  padding:0 22px 20px;
+}
+.card-desc{
+  font-size:13px;
+  line-height:1.65;
+  color:var(--text-secondary);
+  padding-top:14px;
+  border-top:1px solid var(--line-soft);
+  max-width:640px;
 }
 
 .watch-btn{
@@ -599,10 +636,12 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   .filters-bar{ flex-direction:column; align-items:stretch; }
   .filter-field select{ width:100%; }
 
-  .card{ flex-wrap:wrap; padding:16px 18px; }
+  .card-row{ flex-wrap:wrap; padding:16px 18px; }
   .card-index{ text-align:left; min-width:auto; order:1; }
   .card-main{ order:2; width:100%; }
-  .watch-btn{ order:3; width:100%; margin-top:4px; }
+  .card-chevron{ order:3; }
+  .watch-btn{ order:4; width:100%; margin-top:4px; }
+  .card-desc{ padding-left:0; }
 }
 
 </style>
@@ -936,6 +975,7 @@ const STORAGE_KEY = "mcu-archive-watched";
 const THEME_KEY = "mcu-archive-theme";
 
 let watched = new Set();
+let expanded = new Set();
 let state = { search:"", phase:"all", category:"all", sort:"asc" };
 
 /* =====================================================================
@@ -974,35 +1014,59 @@ function toggleWatched(id){
   renderTimeline();
 }
 
+function toggleExpanded(id, cardEl){
+  if(expanded.has(id)){
+    expanded.delete(id);
+    cardEl.classList.remove("is-expanded");
+    cardEl.setAttribute("aria-expanded", "false");
+  }else{
+    expanded.add(id);
+    cardEl.classList.add("is-expanded");
+    cardEl.setAttribute("aria-expanded", "true");
+  }
+}
+
 /* =====================================================================
    RENDERING — CARD
    ===================================================================== */
 function buildCard(item, indexNumber){
   const isWatched = watched.has(item.id);
+  const isExpanded = expanded.has(item.id);
 
   const card = document.createElement("article");
-  card.className = "card" + (isWatched ? " is-watched" : "");
+  card.className = "card" + (isWatched ? " is-watched" : "") + (isExpanded ? " is-expanded" : "");
+  card.setAttribute("aria-expanded", String(isExpanded));
 
   card.innerHTML = `
-    <span class="card-index">${indexNumber}</span>
-    <div class="card-main">
-      <h3 class="card-title">${item.title}</h3>
-      <div class="card-info-row">
-        <span>${item.displayDate}</span>
-        <span>${categoryLabel(item.category)}</span>
-        ${item.unreleased ? '<span class="unreleased-tag">Unreleased</span>' : ''}
+    <div class="card-row">
+      <span class="card-index">${indexNumber}</span>
+      <div class="card-main">
+        <h3 class="card-title">${item.title}</h3>
+        <div class="card-info-row">
+          <span>${item.displayDate}</span>
+          <span>${categoryLabel(item.category)}</span>
+          ${item.unreleased ? '<span class="unreleased-tag">Unreleased</span>' : ''}
+        </div>
       </div>
+      <span class="card-chevron" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <button class="watch-btn ${isWatched ? "watched" : ""}" data-id="${item.id}">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>${isWatched ? "Watched" : "Mark as Watched"}</span>
+      </button>
     </div>
-    <button class="watch-btn ${isWatched ? "watched" : ""}" data-id="${item.id}">
-      <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span>${isWatched ? "Watched" : "Mark as Watched"}</span>
-    </button>
+    <div class="card-desc-wrap">
+      <p class="card-desc">${item.synopsis}</p>
+    </div>
   `;
 
   card.querySelector(".watch-btn").addEventListener("click", (e) => {
     e.stopPropagation();
     toggleWatched(item.id);
   });
+
+  card.addEventListener("click", () => toggleExpanded(item.id, card));
 
   return card;
 }
