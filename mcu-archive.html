@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCU Archive — Marvel Cinematic Universe Timeline</title>
+<meta name="description" content="A complete, in-order archive of the Marvel Cinematic Universe: every movie, series, and special presentation with watch-progress tracking.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* =====================================================================
+   1. VARIABLES & ROOT
+   ===================================================================== */
+:root{
+  /* Palette */
+  --black:#000000;
+  --near-black:#0A0A0A;
+  --dark-gray:#1A1A1A;
+  --surface:#161616;
+  --surface-2:#1F1F1F;
+  --line:#2E2E2E;
+  --line-soft:#242424;
+  --marvel-red:#ED1D24;
+  --red-deep:#A8141A;
+  --red-dim:#5C0D10;
+  --white:#FFFFFF;
+  --gray-100:#D4D4D4;
+  --gray-300:#A3A3A3;
+  --gray-500:#6E6E6E;
+
+  /* Type */
+  --font-display:'Archivo Black', 'Arial Black', sans-serif;
+  --font-body:'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+
+  /* Layout */
+  --max-width:1240px;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --nav-height:72px;
+
+  /* Motion */
+  --ease:cubic-bezier(.4,0,.2,1);
+  --transition-fast:180ms var(--ease);
+  --transition-med:320ms var(--ease);
+
+  /* Theme-swappable tokens (dark = default) */
+  --bg:var(--near-black);
+  --bg-elevated:var(--surface);
+  --text-primary:var(--white);
+  --text-secondary:var(--gray-300);
+  --border-color:var(--line);
+}
+
+/* Light ("Cinema Light") theme override */
+body.theme-light{
+  --bg:#F3F3F1;
+  --bg-elevated:#FFFFFF;
+  --text-primary:#0A0A0A;
+  --text-secondary:#4B4B4B;
+  --border-color:#DDDBD8;
+  --surface:#FFFFFF;
+  --surface-2:#F7F7F5;
+}
+
+/* =====================================================================
+   2. RESET
+   ===================================================================== */
+*, *::before, *::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; cursor:pointer; background:none; border:none; color:inherit; }
+input, select{ font:inherit; color:inherit; }
+ul, ol{ list-style:none; }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+}
+
+/* =====================================================================
+   3. BASE TYPOGRAPHY
+   ===================================================================== */
+body{
+  background:var(--bg);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background var(--transition-med), color var(--transition-med);
+}
+
+.section-inner{ max-width:var(--max-width); margin:0 auto; padding:0 24px; }
+
+.section-eyebrow{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--marvel-red);
+  margin-bottom:10px;
+}
+.section-title{
+  font-family:var(--font-display);
+  font-size:clamp(28px, 4vw, 42px);
+  letter-spacing:.01em;
+  margin-bottom:36px;
+  text-transform:uppercase;
+}
+
+/* =====================================================================
+   4. BUTTONS
+   ===================================================================== */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px 30px;
+  font-family:var(--font-body);
+  font-weight:700;
+  font-size:13.5px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  border-radius:2px;
+  transition:transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  position:relative;
+  overflow:hidden;
+}
+.btn:active{ transform:scale(0.97); }
+
+.btn-primary{
+  background:var(--marvel-red);
+  color:var(--white);
+}
+.btn-primary::after{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform:translateX(-120%);
+  transition:transform 600ms var(--ease);
+}
+.btn-primary:hover::after{ transform:translateX(120%); }
+.btn-primary:hover{ background:var(--red-deep); }
+
+.btn-outline{
+  border:1.5px solid var(--white);
+  color:var(--white);
+  background:transparent;
+}
+.btn-outline:hover{ background:rgba(255,255,255,0.08); }
+
+.btn-ghost{
+  border:1.5px solid var(--border-color);
+  color:var(--text-secondary);
+  padding:12px 20px;
+  font-size:12.5px;
+}
+.btn-ghost:hover{ border-color:var(--marvel-red); color:var(--marvel-red); }
+
+/* =====================================================================
+   5. LOADING SCREEN
+   ===================================================================== */
+.loading-screen{
+  position:fixed; inset:0; z-index:9999;
+  background:var(--black);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:22px;
+  transition:opacity 500ms var(--ease), visibility 500ms var(--ease);
+}
+.loading-screen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+
+.loading-mark{
+  font-family:var(--font-display);
+  font-size:38px;
+  letter-spacing:.08em;
+  color:var(--white);
+}
+.loading-bar-track{
+  width:220px; height:3px; background:var(--dark-gray); border-radius:2px; overflow:hidden;
+}
+.loading-bar-fill{
+  height:100%; width:0%;
+  background:var(--marvel-red);
+  transition:width 200ms var(--ease);
+}
+.loading-label{
+  font-family:var(--font-mono);
+  font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gray-500);
+}
+
+/* =====================================================================
+   6. NAVBAR
+   ===================================================================== */
+.navbar{
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  height:var(--nav-height);
+  display:flex; flex-direction:column;
+  background:transparent;
+  transition:background var(--transition-med), backdrop-filter var(--transition-med), box-shadow var(--transition-med);
+}
+.navbar.scrolled{
+  background:rgba(10,10,10,0.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 rgba(255,255,255,0.06);
+}
+body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow:0 1px 0 rgba(0,0,0,0.06); }
+
+.navbar-inner{
+  max-width:var(--max-width); width:100%; margin:0 auto;
+  height:var(--nav-height);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px;
+}
+
+.brand{ display:flex; align-items:baseline; gap:8px; }
+.brand-mark{
+  font-family:var(--font-display);
+  font-size:20px; color:var(--marvel-red); letter-spacing:.03em;
+}
+.brand-text{
+  font-family:var(--font-mono);
+  font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-secondary);
+}
+
+.nav-links{ display:flex; align-items:center; gap:36px; }
+.nav-links a{
+  font-size:13.5px; font-weight:600; letter-spacing:.03em; text-transform:uppercase;
+  color:var(--text-secondary);
+  position:relative;
+  padding:6px 0;
+  transition:color var(--transition-fast);
+}
+.nav-links a::after{
+  content:""; position:absolute; left:0; bottom:0; height:2px; width:0;
+  background:var(--marvel-red); transition:width var(--transition-fast);
+}
+.nav-links a:hover{ color:var(--text-primary); }
+.nav-links a:hover::after{ width:100%; }
+
+.navbar-actions{ display:flex; align-items:center; gap:8px; }
+.icon-btn{
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-secondary);
+  transition:background var(--transition-fast), color var(--transition-fast);
+}
+.icon-btn svg{ width:19px; height:19px; }
+.icon-btn:hover{ background:rgba(237,29,36,0.12); color:var(--marvel-red); }
+
+.hamburger{
+  display:none;
+  width:38px; height:38px;
+  flex-direction:column; align-items:center; justify-content:center; gap:5px;
+}
+.hamburger span{
+  width:20px; height:2px; background:var(--text-primary);
+  transition:transform var(--transition-fast), opacity var(--transition-fast);
+}
+.hamburger.active span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.hamburger.active span:nth-child(2){ opacity:0; }
+.hamburger.active span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+.navbar-search{
+  max-height:0; overflow:hidden;
+  background:var(--bg-elevated);
+  transition:max-height var(--transition-med);
+  border-bottom:1px solid transparent;
+}
+.navbar-search.open{ max-height:70px; border-bottom-color:var(--border-color); }
+.navbar-search input{
+  width:100%; max-width:var(--max-width); margin:0 auto; display:block;
+  padding:16px 24px;
+  background:transparent; border:none; outline:none;
+  color:var(--text-primary); font-size:15px;
+}
+
+/* =====================================================================
+   7. HERO
+   ===================================================================== */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  background:var(--black);
+}
+
+.hero-bg{ position:absolute; inset:0; }
+.hero-grid{
+  position:absolute; inset:-2px;
+  background-image:
+    linear-gradient(rgba(237,29,36,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237,29,36,0.08) 1px, transparent 1px);
+  background-size:56px 56px;
+  animation:gridDrift 24s linear infinite;
+  opacity:.5;
+}
+@keyframes gridDrift{
+  0%{ transform:translate(0,0); }
+  100%{ transform:translate(56px,56px); }
+}
+.hero-sweep{
+  position:absolute; top:0; bottom:0; width:36%;
+  background:linear-gradient(100deg, transparent, rgba(237,29,36,0.10), transparent);
+  animation:sweep 9s ease-in-out infinite;
+}
+@keyframes sweep{
+  0%{ left:-40%; }
+  50%{ left:70%; }
+  100%{ left:-40%; }
+}
+.hero-overlay{
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse 900px 620px at 50% 40%, rgba(20,20,20,0.2), rgba(0,0,0,0.86) 70%);
+}
+
+.hero-content{ position:relative; z-index:2; text-align:center; max-width:760px; padding:0 24px; }
+.hero-eyebrow{
+  font-family:var(--font-mono); font-size:12.5px; letter-spacing:.3em; text-transform:uppercase;
+  color:var(--marvel-red); margin-bottom:20px;
+}
+.hero-title{ font-family:var(--font-display); line-height:1.02; }
+.hero-title-line{
+  display:block; font-size:clamp(38px, 8vw, 78px); letter-spacing:.02em; color:var(--white);
+}
+.hero-title-accent{ color:var(--marvel-red); font-size:clamp(24px, 4.4vw, 44px); margin-top:6px; }
+.hero-subtitle{
+  margin:26px auto 0; max-width:560px;
+  color:var(--gray-300); font-size:15.5px; line-height:1.7;
+}
+.hero-actions{ margin-top:38px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+
+.scroll-indicator{
+  position:absolute; bottom:34px; left:50%; transform:translateX(-50%);
+  width:26px; height:42px; border:2px solid rgba(255,255,255,0.4); border-radius:14px;
+  display:flex; justify-content:center; padding-top:8px; z-index:2;
+}
+.scroll-indicator span{
+  width:4px; height:8px; border-radius:2px; background:var(--marvel-red);
+  animation:scrollDot 1.8s ease-in-out infinite;
+}
+@keyframes scrollDot{
+  0%{ transform:translateY(0); opacity:1; }
+  70%{ transform:translateY(12px); opacity:0; }
+  100%{ opacity:0; }
+}
+
+/* =====================================================================
+   8. SCROLL REVEAL
+   ===================================================================== */
+.reveal{
+  opacity:0; transform:translateY(24px);
+  transition:opacity 700ms var(--ease), transform 700ms var(--ease);
+}
+.reveal.in-view{ opacity:1; transform:translateY(0); }
+
+/* =====================================================================
+   9. DASHBOARD
+   ===================================================================== */
+.dashboard{ padding:110px 0 90px; }
+
+.dashboard-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:34px;
+}
+.stat-card{
+  background:var(--bg-elevated);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  padding:26px 22px;
+  display:flex; flex-direction:column; gap:10px;
+  transition:border-color var(--transition-fast), transform var(--transition-fast);
+}
+.stat-card:hover{ border-color:var(--marvel-red); transform:translateY(-3px); }
+.stat-card-accent{ border-color:var(--marvel-red); background:linear-gradient(160deg, rgba(237,29,36,0.10), transparent 70%), var(--bg-elevated); }
+
+.stat-label{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-secondary);
+}
+.stat-value{ font-family:var(--font-display); font-size:34px; color:var(--text-primary); }
+
+.progress-bar-wrap{ max-width:100%; }
+.progress-bar-track{
+  width:100%; height:10px; background:var(--bg-elevated); border:1px solid var(--border-color);
+  border-radius:20px; overflow:hidden;
+}
+.progress-bar-fill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg, var(--red-deep), var(--marvel-red));
+  transition:width 600ms var(--ease);
+  border-radius:20px;
+}
+
+/* =====================================================================
+   10. FILTERS
+   ===================================================================== */
+.filters{ padding:0 0 40px; }
+.filters-bar{
+  display:flex; flex-wrap:wrap; align-items:end; gap:14px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  padding:20px;
+  backdrop-filter:blur(10px);
+}
+.filter-field{ display:flex; flex-direction:column; gap:6px; }
+.filter-field label{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text-secondary);
+}
+.filter-field select{
+  background:var(--surface-2); border:1px solid var(--border-color); color:var(--text-primary);
+  padding:11px 14px; border-radius:var(--radius-sm); min-width:170px;
+  transition:border-color var(--transition-fast);
+}
+.filter-field select:focus, .filter-field input:focus{ outline:none; border-color:var(--marvel-red); }
+
+.filter-search{
+  flex:1; min-width:220px;
+  flex-direction:row; align-items:center; gap:10px;
+  background:var(--surface-2); border:1px solid var(--border-color);
+  border-radius:var(--radius-sm); padding:0 14px;
+}
+.filter-search svg{ width:17px; height:17px; color:var(--text-secondary); flex-shrink:0; }
+.filter-search input{
+  flex:1; background:transparent; border:none; padding:12px 0; color:var(--text-primary);
+}
+.filter-search input:focus{ outline:none; }
+
+.filters-meta{
+  margin-top:14px; font-family:var(--font-mono); font-size:11.5px; color:var(--text-secondary);
+}
+
+/* =====================================================================
+   11. TIMELINE
+   ===================================================================== */
+.timeline-section{ padding:20px 0 100px; }
+
+.timeline-container{ max-width:var(--max-width); margin:0 auto; padding:0 24px; }
+
+.phase-group{ margin-bottom:56px; position:relative; }
+.phase-header{
+  display:flex; align-items:center; gap:14px; margin-bottom:22px;
+  padding-left:26px; position:relative;
+}
+.phase-header::before{
+  content:""; position:absolute; left:0; top:2px; width:10px; height:10px;
+  border-radius:50%; background:var(--marvel-red);
+  box-shadow:0 0 0 4px rgba(237,29,36,0.18);
+}
+.phase-header-title{
+  font-family:var(--font-display); font-size:19px; letter-spacing:.03em; text-transform:uppercase;
+}
+.phase-header-count{
+  font-family:var(--font-mono); font-size:11.5px; color:var(--text-secondary);
+}
+
+.phase-body{
+  position:relative;
+  padding-left:26px;
+  border-left:1px solid var(--border-color);
+}
+
+.card-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* =====================================================================
+   12. CARD
+   ===================================================================== */
+.card{
+  background:var(--bg-elevated);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  padding:18px 22px;
+  display:flex;
+  align-items:center;
+  gap:22px;
+  transition:border-color var(--transition-med), background var(--transition-med), transform var(--transition-fast);
+  position:relative;
+}
+.card:hover{
+  border-color:var(--marvel-red);
+  background:linear-gradient(90deg, rgba(237,29,36,0.06), transparent 60%), var(--bg-elevated);
+  transform:translateX(4px);
+}
+.card.is-watched{ border-color:rgba(237,29,36,0.35); }
+
+.card-index{
+  font-family:var(--font-mono);
+  font-size:15px;
+  color:var(--marvel-red);
+  min-width:34px;
+  flex-shrink:0;
+  text-align:right;
+}
+
+.card-main{ flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+
+.card-title{
+  font-family:var(--font-display);
+  font-size:16.5px;
+  letter-spacing:.01em;
+  line-height:1.3;
+  text-transform:uppercase;
+}
+.card.is-watched .card-title{ color:var(--text-secondary); }
+
+.card-info-row{
+  display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-secondary);
+}
+.unreleased-tag{
+  font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--marvel-red); border:1px solid rgba(237,29,36,0.4); padding:2px 8px; border-radius:20px;
+}
+
+.watch-btn{
+  flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 18px;
+  border:1.5px solid var(--border-color);
+  border-radius:var(--radius-sm);
+  font-size:11.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+  color:var(--text-primary);
+  transition:all var(--transition-fast);
+  white-space:nowrap;
+}
+.watch-btn svg{ width:14px; height:14px; opacity:0; transition:opacity var(--transition-fast); flex-shrink:0; }
+.watch-btn:hover{ border-color:var(--marvel-red); color:var(--marvel-red); }
+.watch-btn.watched{
+  background:var(--marvel-red); border-color:var(--marvel-red); color:#fff;
+}
+.watch-btn.watched svg{ opacity:1; }
+
+/* =====================================================================
+   13. EMPTY STATE
+   ===================================================================== */
+.empty-state{
+  text-align:center; color:var(--text-secondary); font-family:var(--font-mono);
+  font-size:13px; padding:40px 0;
+}
+
+/* =====================================================================
+   14. FOOTER
+   ===================================================================== */
+.site-footer{ border-top:1px solid var(--border-color); padding:50px 0; }
+.footer-inner{ display:flex; flex-direction:column; gap:14px; align-items:flex-start; }
+.footer-brand{ margin-bottom:4px; }
+.footer-note{ color:var(--text-secondary); font-size:13px; max-width:520px; line-height:1.6; }
+.footer-copy{ color:var(--gray-500); font-size:11.5px; font-family:var(--font-mono); }
+
+/* =====================================================================
+   15. SCROLL TO TOP
+   ===================================================================== */
+.scroll-top{
+  position:fixed; bottom:26px; right:26px; z-index:900;
+  width:46px; height:46px; border-radius:50%;
+  background:var(--marvel-red); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden; transform:translateY(10px);
+  transition:opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+  box-shadow:0 10px 26px -10px rgba(237,29,36,0.6);
+}
+.scroll-top.visible{ opacity:1; visibility:visible; transform:translateY(0); }
+.scroll-top svg{ width:18px; height:18px; }
+
+/* =====================================================================
+   16. RESPONSIVE
+   ===================================================================== */
+@media (max-width:900px){
+  .dashboard-grid{ grid-template-columns:repeat(2, 1fr); }
+  .nav-links{ display:none; }
+  .hamburger{ display:flex; }
+
+  .navbar.menu-open .nav-links{
+    display:flex; flex-direction:column; align-items:flex-start; gap:0;
+    position:absolute; top:var(--nav-height); left:0; right:0;
+    background:var(--bg); border-bottom:1px solid var(--border-color);
+    padding:8px 24px 18px;
+  }
+  .navbar.menu-open .nav-links a{ width:100%; padding:12px 0; border-bottom:1px solid var(--line-soft); }
+}
+
+@media (max-width:640px){
+  .dashboard-grid{ grid-template-columns:1fr 1fr; }
+  .hero-actions{ flex-direction:column; width:100%; }
+  .btn{ width:100%; }
+  .filters-bar{ flex-direction:column; align-items:stretch; }
+  .filter-field select{ width:100%; }
+
+  .card{ flex-wrap:wrap; padding:16px 18px; }
+  .card-index{ text-align:left; min-width:auto; order:1; }
+  .card-main{ order:2; width:100%; }
+  .watch-btn{ order:3; width:100%; margin-top:4px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================= -->
+<!-- LOADING SCREEN                -->
+<!-- ============================= -->
+<div class="loading-screen" id="loadingScreen" aria-hidden="true">
+  <div class="loading-mark">MCU</div>
+  <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+  <div class="loading-label">Loading archive</div>
+</div>
+
+<!-- ============================= -->
+<!-- NAVBAR                        -->
+<!-- ============================= -->
+<header class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="#home" class="brand">
+      <span class="brand-mark">MCU</span>
+      <span class="brand-text">Archive</span>
+    </a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#dashboard">Progress</a>
+      <a href="#timeline">Timeline</a>
+    </nav>
+
+    <div class="navbar-actions">
+      <button class="icon-btn" id="searchToggle" aria-label="Search titles">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" id="themeIcon"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="navbar-search" id="navbarSearch">
+    <input type="text" id="navSearchInput" placeholder="Search the archive…" autocomplete="off">
+  </div>
+</header>
+
+<!-- ============================= -->
+<!-- HERO                          -->
+<!-- ============================= -->
+<section class="hero" id="home">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-grid"></div>
+    <div class="hero-sweep"></div>
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal" data-reveal>Every Story · One Chronology</p>
+    <h1 class="hero-title reveal" data-reveal>
+      <span class="hero-title-line">MARVEL</span>
+      <span class="hero-title-line hero-title-accent">CINEMATIC UNIVERSE</span>
+    </h1>
+    <p class="hero-subtitle reveal" data-reveal>
+      The complete archive of the MCU — every film, series, and special presentation,
+      organized in exact release order and ready to track from Phase One to the Multiverse Saga.
+    </p>
+    <div class="hero-actions reveal" data-reveal>
+      <a href="#timeline" class="btn btn-primary">Browse the Timeline</a>
+      <a href="#dashboard" class="btn btn-outline">View My Progress</a>
+    </div>
+  </div>
+
+  <a href="#dashboard" class="scroll-indicator" aria-label="Scroll down">
+    <span></span>
+  </a>
+</section>
+
+<!-- ============================= -->
+<!-- WATCH PROGRESS DASHBOARD      -->
+<!-- ============================= -->
+<section class="dashboard" id="dashboard">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal" data-reveal>Your Archive Status</p>
+    <h2 class="section-title reveal" data-reveal>Watch Progress</h2>
+
+    <div class="dashboard-grid reveal" data-reveal>
+      <div class="stat-card">
+        <span class="stat-label">Total Titles</span>
+        <span class="stat-value" id="statTotal">0</span>
+      </div>
+      <div class="stat-card stat-card-accent">
+        <span class="stat-label">Watched</span>
+        <span class="stat-value" id="statWatched">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Remaining</span>
+        <span class="stat-value" id="statRemaining">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Completion</span>
+        <span class="stat-value" id="statPercent">0%</span>
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap reveal" data-reveal>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- FILTERS / SEARCH              -->
+<!-- ============================= -->
+<section class="filters" id="filtersSection">
+  <div class="section-inner">
+    <div class="filters-bar reveal" data-reveal>
+      <div class="filter-field filter-search">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by title…" autocomplete="off">
+      </div>
+
+      <div class="filter-field">
+        <label for="phaseFilter">Phase</label>
+        <select id="phaseFilter">
+          <option value="all">All Phases</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="categoryFilter">Category</label>
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="movie">Movies</option>
+          <option value="series">Disney+ Series</option>
+          <option value="special">Special Presentations</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="sortFilter">Sort</label>
+        <select id="sortFilter">
+          <option value="asc">Release Date ↑</option>
+          <option value="desc">Release Date ↓</option>
+        </select>
+      </div>
+
+      <button class="btn btn-ghost" id="resetFilters">Reset Filters</button>
+    </div>
+
+    <p class="filters-meta" id="resultsMeta"></p>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- TIMELINE                      -->
+<!-- ============================= -->
+<section class="timeline-section" id="timeline">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal" data-reveal>Phase One — The Multiverse Saga</p>
+    <h2 class="section-title reveal" data-reveal>The Full Chronology</h2>
+  </div>
+
+  <div class="timeline-container" id="timelineContainer">
+    <!-- Populated by script.js -->
+  </div>
+
+  <p class="empty-state" id="emptyState" hidden>No titles match your filters. Try resetting them.</p>
+</section>
+
+<!-- ============================= -->
+<!-- FOOTER                        -->
+<!-- ============================= -->
+<footer class="site-footer">
+  <div class="section-inner footer-inner">
+    <div class="brand footer-brand">
+      <span class="brand-mark">MCU</span>
+      <span class="brand-text">Archive</span>
+    </div>
+    <p class="footer-note">An unofficial fan-made archive and watch tracker. Not affiliated with or endorsed by Marvel Studios or The Walt Disney Company.</p>
+    <p class="footer-copy">Built with HTML, CSS &amp; JavaScript — progress stored locally in your browser.</p>
+  </div>
+</footer>
+
+<!-- ============================= -->
+<!-- SCROLL TO TOP                 -->
+<!-- ============================= -->
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+  <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="19" x2="12" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="5 12 12 5 19 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
+/* =====================================================================
+   DATA
+   Original, factual reference data (titles/dates/phases/categories).
+   Synopses are written in-house — not sourced from marketing copy.
+   ===================================================================== */
+const TITLES = [
+  { id:"iron-man", title:"Iron Man", date:"2008-05-02", displayDate:"May 2, 2008", runtime:"126 min", phase:"Phase One", category:"movie",
+    synopsis:"A billionaire engineer builds a powered suit of armor after a near-fatal ambush, then turns it on the weapons dealers who once armed him." },
+  { id:"incredible-hulk", title:"The Incredible Hulk", date:"2008-06-13", displayDate:"June 13, 2008", runtime:"112 min", phase:"Phase One", category:"movie",
+    synopsis:"A fugitive scientist searches for a cure to the rage that transforms him into the Hulk while the military closes in." },
+  { id:"iron-man-2", title:"Iron Man 2", date:"2010-05-07", displayDate:"May 7, 2010", runtime:"124 min", phase:"Phase One", category:"movie",
+    synopsis:"Facing government pressure over his armor technology, Tony Stark battles a vengeful physicist and the slow poisoning of his own reactor." },
+  { id:"thor", title:"Thor", date:"2011-05-06", displayDate:"May 6, 2011", runtime:"115 min", phase:"Phase One", category:"movie",
+    synopsis:"Banished to Earth for his recklessness, an Asgardian prince must earn back his hammer and stop his brother's plot to seize the throne." },
+  { id:"cap-first-avenger", title:"Captain America: The First Avenger", date:"2011-07-22", displayDate:"July 22, 2011", runtime:"124 min", phase:"Phase One", category:"movie",
+    synopsis:"A scrawny recruit becomes a super-soldier and fights a Nazi-splinter organization during World War II." },
+  { id:"avengers", title:"The Avengers", date:"2012-05-04", displayDate:"May 4, 2012", runtime:"143 min", phase:"Phase One", category:"movie",
+    synopsis:"A team of extraordinary individuals is assembled to stop an adopted Asgardian god and an alien army from conquering Earth." },
+  { id:"iron-man-3", title:"Iron Man 3", date:"2013-05-03", displayDate:"May 3, 2013", runtime:"130 min", phase:"Phase Two", category:"movie",
+    synopsis:"Still shaken after battling an alien invasion, Tony Stark faces a terrorist mastermind while his personal life unravels." },
+  { id:"thor-dark-world", title:"Thor: The Dark World", date:"2013-11-08", displayDate:"Nov 8, 2013", runtime:"112 min", phase:"Phase Two", category:"movie",
+    synopsis:"Thor reluctantly teams up with his imprisoned brother to stop an ancient enemy from plunging the universe into darkness." },
+  { id:"cap-winter-soldier", title:"Captain America: The Winter Soldier", date:"2014-04-04", displayDate:"April 4, 2014", runtime:"136 min", phase:"Phase Two", category:"movie",
+    synopsis:"A super-soldier uncovers a conspiracy inside the intelligence agency he serves and faces a deadly assassin from his past." },
+  { id:"gotg-1", title:"Guardians of the Galaxy", date:"2014-08-01", displayDate:"Aug 1, 2014", runtime:"121 min", phase:"Phase Two", category:"movie",
+    synopsis:"A band of misfit outlaws bands together to stop a fanatic from destroying a planet with a powerful orb." },
+  { id:"avengers-aou", title:"Avengers: Age of Ultron", date:"2015-05-01", displayDate:"May 1, 2015", runtime:"141 min", phase:"Phase Two", category:"movie",
+    synopsis:"A peacekeeping artificial intelligence turns against humanity, forcing a team of heroes to confront a threat of their own making." },
+  { id:"ant-man", title:"Ant-Man", date:"2015-07-17", displayDate:"July 17, 2015", runtime:"117 min", phase:"Phase Two", category:"movie",
+    synopsis:"A small-time thief dons a size-shifting suit to help its creator pull off a heist that could protect the world." },
+  { id:"cap-civil-war", title:"Captain America: Civil War", date:"2016-05-06", displayDate:"May 6, 2016", runtime:"147 min", phase:"Phase Three", category:"movie",
+    synopsis:"A government effort to regulate enhanced individuals splits a team of heroes into two opposing factions." },
+  { id:"agent-carter-s1", title:"Agent Carter", date:"2015-01-06", displayDate:"Jan 6, 2015", runtime:"8 Episodes", phase:"Phase Two", category:"series",
+    synopsis:"Working in the shadows of a male-dominated agency, Peggy Carter clears a friend's name while balancing double lives." },
+  { id:"doctor-strange", title:"Doctor Strange", date:"2016-11-04", displayDate:"Nov 4, 2016", runtime:"115 min", phase:"Phase Three", category:"movie",
+    synopsis:"After a car accident ends his surgical career, a brilliant surgeon learns the mystic arts and confronts threats beyond the physical world." },
+  { id:"gotg-2", title:"Guardians of the Galaxy Vol. 2", date:"2017-05-05", displayDate:"May 5, 2017", runtime:"136 min", phase:"Phase Three", category:"movie",
+    synopsis:"A team of cosmic misfits faces family secrets as their leader reunites with his mysterious father." },
+  { id:"spiderman-homecoming", title:"Spider-Man: Homecoming", date:"2017-07-07", displayDate:"July 7, 2017", runtime:"133 min", phase:"Phase Three", category:"movie",
+    synopsis:"A teenage hero balances high school with his new responsibilities, taking on an arms dealer selling alien weaponry." },
+  { id:"thor-ragnarok", title:"Thor: Ragnarok", date:"2017-11-03", displayDate:"Nov 3, 2017", runtime:"130 min", phase:"Phase Three", category:"movie",
+    synopsis:"Stripped of his powers and hammer, Thor must escape a cosmic prison to stop his sister from destroying his home world." },
+  { id:"black-panther", title:"Black Panther", date:"2018-02-16", displayDate:"Feb 16, 2018", runtime:"134 min", phase:"Phase Three", category:"movie",
+    synopsis:"A new king returns home to claim the throne, but a rival with ties to his family's past threatens to tear the nation apart." },
+  { id:"infinity-war", title:"Avengers: Infinity War", date:"2018-04-27", displayDate:"April 27, 2018", runtime:"149 min", phase:"Phase Three", category:"movie",
+    synopsis:"Earth's mightiest heroes race across the galaxy to stop a powerful warlord from collecting six ancient stones and erasing half of all life." },
+  { id:"ant-man-wasp", title:"Ant-Man and the Wasp", date:"2018-07-06", displayDate:"July 6, 2018", runtime:"118 min", phase:"Phase Three", category:"movie",
+    synopsis:"A reluctant hero teams up with his partner's daughter to rescue her mother from a dimension of subatomic space." },
+  { id:"captain-marvel", title:"Captain Marvel", date:"2019-03-08", displayDate:"March 8, 2019", runtime:"124 min", phase:"Phase Three", category:"movie",
+    synopsis:"An Air Force pilot discovers her cosmic powers and uncovers a hidden past amid a war between two alien races." },
+  { id:"endgame", title:"Avengers: Endgame", date:"2019-04-26", displayDate:"April 26, 2019", runtime:"181 min", phase:"Phase Three", category:"movie",
+    synopsis:"The surviving heroes attempt a desperate plan to undo a catastrophic loss and reverse the disappearance of half the universe." },
+  { id:"far-from-home", title:"Spider-Man: Far From Home", date:"2019-07-02", displayDate:"July 2, 2019", runtime:"129 min", phase:"Phase Three", category:"movie",
+    synopsis:"A school trip across Europe turns into a mission when a mysterious new hero reveals a threat tied to the elements." },
+  { id:"wandavision", title:"WandaVision", date:"2021-01-15", displayDate:"Jan 15, 2021", runtime:"9 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A grieving hero and her synthetic partner live an idyllic, sitcom-style life until cracks in the illusion reveal a deeper mystery." },
+  { id:"falcon-winter-soldier", title:"The Falcon and the Winter Soldier", date:"2021-03-19", displayDate:"March 19, 2021", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"Two former allies team up to stop a militant group and confront the legacy of a shield passed down between them." },
+  { id:"loki-s1", title:"Loki (Season 1)", date:"2021-06-09", displayDate:"June 9, 2021", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"An alternate version of a trickster god is captured by a bureaucratic time agency and forced to help fix fractures in the timeline." },
+  { id:"black-widow", title:"Black Widow", date:"2021-07-09", displayDate:"July 9, 2021", runtime:"134 min", phase:"Phase Four", category:"movie",
+    synopsis:"A former spy confronts her past and reunites with the estranged operatives she once called family." },
+  { id:"what-if-s1", title:"What If...? (Season 1)", date:"2021-08-11", displayDate:"Aug 11, 2021", runtime:"9 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A cosmic observer explores alternate timelines where pivotal moments unfold in unexpected ways." },
+  { id:"shang-chi", title:"Shang-Chi and the Legend of the Ten Rings", date:"2021-09-03", displayDate:"Sept 3, 2021", runtime:"132 min", phase:"Phase Four", category:"movie",
+    synopsis:"A skilled martial artist is pulled back into the secret organization his father leads after years of hiding away." },
+  { id:"eternals", title:"Eternals", date:"2021-11-05", displayDate:"Nov 5, 2021", runtime:"157 min", phase:"Phase Four", category:"movie",
+    synopsis:"A group of ancient immortals who secretly shaped human history reunite to face a threat tied to their true purpose." },
+  { id:"hawkeye", title:"Hawkeye", date:"2021-11-24", displayDate:"Nov 24, 2021", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A veteran archer trains a determined newcomer while being pursued by figures from his past." },
+  { id:"no-way-home", title:"Spider-Man: No Way Home", date:"2021-12-17", displayDate:"Dec 17, 2021", runtime:"148 min", phase:"Phase Four", category:"movie",
+    synopsis:"When a spell to conceal his identity goes wrong, a young hero faces villains pulled in from other universes." },
+  { id:"moon-knight", title:"Moon Knight", date:"2022-03-30", displayDate:"March 30, 2022", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A mild-mannered gift-shop worker discovers he shares a body with a mercenary and becomes entangled with an ancient god." },
+  { id:"multiverse-madness", title:"Doctor Strange in the Multiverse of Madness", date:"2022-05-06", displayDate:"May 6, 2022", runtime:"126 min", phase:"Phase Four", category:"movie",
+    synopsis:"A sorcerer journeys across the multiverse to protect a young woman with reality-warping powers from a relentless pursuer." },
+  { id:"ms-marvel", title:"Ms. Marvel", date:"2022-06-08", displayDate:"June 8, 2022", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A teenager gains extraordinary powers and idolizes the heroes she grew up admiring while uncovering her family's hidden history." },
+  { id:"love-thunder", title:"Thor: Love and Thunder", date:"2022-07-08", displayDate:"July 8, 2022", runtime:"119 min", phase:"Phase Four", category:"movie",
+    synopsis:"Seeking inner peace, Thor is drawn back into battle when a vengeful figure begins hunting gods across the universe." },
+  { id:"she-hulk", title:"She-Hulk: Attorney at Law", date:"2022-08-18", displayDate:"Aug 18, 2022", runtime:"9 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A lawyer inherits her cousin's powers and navigates work, relationships, and sudden fame as a green-skinned hero." },
+  { id:"werewolf-by-night", title:"Werewolf by Night", date:"2022-10-07", displayDate:"Oct 7, 2022", runtime:"53 min", phase:"Phase Four", category:"special",
+    synopsis:"A secret society of monster hunters competes in a deadly ritual contest to inherit a powerful relic." },
+  { id:"wakanda-forever", title:"Black Panther: Wakanda Forever", date:"2022-11-11", displayDate:"Nov 11, 2022", runtime:"161 min", phase:"Phase Four", category:"movie",
+    synopsis:"Following their king's death, a nation's leaders must protect their home from a new underwater kingdom while grieving his loss." },
+  { id:"gotg-holiday", title:"The Guardians of the Galaxy Holiday Special", date:"2022-11-25", displayDate:"Nov 25, 2022", runtime:"44 min", phase:"Phase Four", category:"special",
+    synopsis:"Two cosmic misfits travel to Earth to find the perfect holiday gift for their grieving captain." },
+  { id:"quantumania", title:"Ant-Man and the Wasp: Quantumania", date:"2023-02-17", displayDate:"Feb 17, 2023", runtime:"125 min", phase:"Phase Five", category:"movie",
+    synopsis:"A family is pulled into a hidden microscopic realm and comes face to face with a powerful conqueror." },
+  { id:"gotg-3", title:"Guardians of the Galaxy Vol. 3", date:"2023-05-05", displayDate:"May 5, 2023", runtime:"150 min", phase:"Phase Five", category:"movie",
+    synopsis:"A team of cosmic misfits risks everything on a mission to save one of their own, uncovering dark origins along the way." },
+  { id:"secret-invasion", title:"Secret Invasion", date:"2023-06-21", displayDate:"June 21, 2023", runtime:"6 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A veteran spymaster uncovers a decades-long infiltration by shape-shifting infiltrators posing as world leaders." },
+  { id:"loki-s2", title:"Loki (Season 2)", date:"2023-10-05", displayDate:"Oct 5, 2023", runtime:"6 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A reformed trickster works to save a fracturing time agency as branching timelines threaten to collapse the multiverse." },
+  { id:"the-marvels", title:"The Marvels", date:"2023-11-10", displayDate:"Nov 10, 2023", runtime:"105 min", phase:"Phase Five", category:"movie",
+    synopsis:"Three heroes with entangled powers must team up after an unstable wormhole forces them to swap places unpredictably." },
+  { id:"what-if-s2", title:"What If...? (Season 2)", date:"2023-12-22", displayDate:"Dec 22, 2023", runtime:"9 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A cosmic observer returns with new alternate-reality stories spinning further off familiar turning points." },
+  { id:"echo", title:"Echo", date:"2024-01-09", displayDate:"Jan 9, 2024", runtime:"5 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A skilled fighter returns to her hometown roots while confronting the criminal underworld connections she left behind." },
+  { id:"deadpool-wolverine", title:"Deadpool & Wolverine", date:"2024-07-26", displayDate:"July 26, 2024", runtime:"128 min", phase:"Phase Five", category:"movie",
+    synopsis:"A wisecracking mercenary recruits a reluctant, clawed loner for a multiversal mission that threatens to unravel his own timeline." },
+  { id:"agatha", title:"Agatha All Along", date:"2024-09-18", displayDate:"Sept 18, 2024", runtime:"9 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A cunning witch assembles an unlikely coven and walks a mysterious road in hopes of reclaiming her lost power." },
+  { id:"what-if-s3", title:"What If...? (Season 3)", date:"2024-12-22", displayDate:"Dec 22, 2024", runtime:"7 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"More alternate-timeline stories close out the animated anthology series." },
+  { id:"brave-new-world", title:"Captain America: Brave New World", date:"2025-02-14", displayDate:"Feb 14, 2025", runtime:"118 min", phase:"Phase Five", category:"movie",
+    synopsis:"A new shield-bearer fully steps into his role and confronts a political conspiracy tied to a dangerous new adversary." },
+  { id:"daredevil-s1", title:"Daredevil: Born Again (Season 1)", date:"2025-03-04", displayDate:"March 4, 2025", runtime:"9 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A lawyer by day and vigilante by night balances both lives as a ruthless figure reclaims power over the city." },
+  { id:"thunderbolts", title:"Thunderbolts*", date:"2025-05-02", displayDate:"May 2, 2025", runtime:"127 min", phase:"Phase Five", category:"movie",
+    synopsis:"A group of morally gray former operatives is thrown together on a black-ops mission and forced to function as a team." },
+  { id:"ironheart", title:"Ironheart", date:"2025-06-24", displayDate:"June 24, 2025", runtime:"6 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A genius young inventor builds her own suit of armor and is pulled into a dangerous partnership that tests her morals." },
+  { id:"fantastic-four", title:"The Fantastic Four: First Steps", date:"2025-07-25", displayDate:"July 25, 2025", runtime:"115 min", phase:"Phase Five", category:"movie",
+    synopsis:"A family of explorers-turned-heroes faces a world-devouring cosmic threat in a retro-futuristic alternate timeline." },
+  { id:"wonder-man", title:"Wonder Man", date:"2026-06-01", displayDate:"2026 · TBA", runtime:"8 Episodes", phase:"Phase Six", category:"series", unreleased:true,
+    synopsis:"An aspiring actor gets pulled into the world of stunt work and superheroics he never asked for." },
+  { id:"visionquest", title:"VisionQuest", date:"2026-07-01", displayDate:"2026 · TBA", runtime:"TBA", phase:"Phase Six", category:"series", unreleased:true,
+    synopsis:"A synthetic being searches for a new identity and purpose after the events that reshaped his existence." },
+  { id:"brand-new-day", title:"Spider-Man: Brand New Day", date:"2026-07-24", displayDate:"2026 · TBA", runtime:"TBA", phase:"Phase Six", category:"movie", unreleased:true,
+    synopsis:"A young hero starts over in the aftermath of a reality-altering spell, navigating a world that no longer remembers him." },
+  { id:"daredevil-s2", title:"Daredevil: Born Again (Season 2)", date:"2026-09-01", displayDate:"2026 · TBA", runtime:"TBA", phase:"Phase Six", category:"series", unreleased:true,
+    synopsis:"The fight for the soul of the city continues into a new chapter." },
+  { id:"doomsday", title:"Avengers: Doomsday", date:"2026-12-18", displayDate:"Dec 18, 2026", runtime:"TBA", phase:"Phase Six", category:"movie", unreleased:true,
+    synopsis:"A wide alliance of heroes joins forces to face a brilliant, armored adversary with designs on reshaping reality itself." },
+  { id:"secret-wars", title:"Avengers: Secret Wars", date:"2027-12-17", displayDate:"Dec 17, 2027", runtime:"TBA", phase:"Phase Six", category:"movie", unreleased:true,
+    synopsis:"The next chapter brings together heroes from across the multiverse for what's billed as the saga's next major turning point." },
+];
+
+const PHASE_ORDER = ["Phase One","Phase Two","Phase Three","Phase Four","Phase Five","Phase Six"];
+const STORAGE_KEY = "mcu-archive-watched";
+const THEME_KEY = "mcu-archive-theme";
+
+let watched = new Set();
+let state = { search:"", phase:"all", category:"all", sort:"asc" };
+
+/* =====================================================================
+   UTILITIES
+   ===================================================================== */
+function categoryLabel(cat){
+  switch(cat){
+    case "movie": return "Movie";
+    case "series": return "Series";
+    case "special": return "Special";
+    default: return cat;
+  }
+}
+
+/* =====================================================================
+   PERSISTENCE
+   ===================================================================== */
+function loadWatched(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    watched = raw ? new Set(JSON.parse(raw)) : new Set();
+  }catch(e){
+    watched = new Set();
+  }
+}
+
+function saveWatched(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...watched]));
+}
+
+function toggleWatched(id){
+  if(watched.has(id)) watched.delete(id);
+  else watched.add(id);
+  saveWatched();
+  updateDashboard();
+  renderTimeline();
+}
+
+/* =====================================================================
+   RENDERING — CARD
+   ===================================================================== */
+function buildCard(item, indexNumber){
+  const isWatched = watched.has(item.id);
+
+  const card = document.createElement("article");
+  card.className = "card" + (isWatched ? " is-watched" : "");
+
+  card.innerHTML = `
+    <span class="card-index">${indexNumber}</span>
+    <div class="card-main">
+      <h3 class="card-title">${item.title}</h3>
+      <div class="card-info-row">
+        <span>${item.displayDate}</span>
+        <span>${categoryLabel(item.category)}</span>
+        ${item.unreleased ? '<span class="unreleased-tag">Unreleased</span>' : ''}
+      </div>
+    </div>
+    <button class="watch-btn ${isWatched ? "watched" : ""}" data-id="${item.id}">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>${isWatched ? "Watched" : "Mark as Watched"}</span>
+    </button>
+  `;
+
+  card.querySelector(".watch-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    toggleWatched(item.id);
+  });
+
+  return card;
+}
+
+/* =====================================================================
+   RENDERING — TIMELINE (grouped by phase, filtered/sorted)
+   ===================================================================== */
+function getFilteredTitles(){
+  let list = TITLES.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(state.search.toLowerCase());
+    const matchesPhase = state.phase === "all" || item.phase === state.phase;
+    const matchesCategory = state.category === "all" || item.category === state.category;
+    return matchesSearch && matchesPhase && matchesCategory;
+  });
+
+  list.sort((a,b) => state.sort === "asc"
+    ? a.date.localeCompare(b.date)
+    : b.date.localeCompare(a.date)
+  );
+
+  return list;
+}
+
+function renderTimeline(){
+  const container = document.getElementById("timelineContainer");
+  const emptyState = document.getElementById("emptyState");
+  const resultsMeta = document.getElementById("resultsMeta");
+  container.innerHTML = "";
+
+  const filtered = getFilteredTitles();
+  resultsMeta.textContent = `Showing ${filtered.length} of ${TITLES.length} titles`;
+
+  if(filtered.length === 0){
+    emptyState.hidden = false;
+    return;
+  }
+  emptyState.hidden = true;
+
+  // Group by phase, preserving sort order within each group.
+  const grouped = {};
+  filtered.forEach(item => {
+    if(!grouped[item.phase]) grouped[item.phase] = [];
+    grouped[item.phase].push(item);
+  });
+
+  const phaseKeys = state.sort === "asc" ? PHASE_ORDER : [...PHASE_ORDER].reverse();
+
+  phaseKeys.forEach(phase => {
+    if(!grouped[phase]) return;
+    const items = grouped[phase];
+
+    const group = document.createElement("div");
+    group.className = "phase-group";
+    group.innerHTML = `
+      <div class="phase-header">
+        <span class="phase-header-title">${phase}</span>
+        <span class="phase-header-count">${items.length} title${items.length === 1 ? "" : "s"}</span>
+      </div>
+      <div class="phase-body">
+        <div class="card-list"></div>
+      </div>
+    `;
+    const grid = group.querySelector(".card-list");
+    items.forEach(item => {
+      const globalIndex = TITLES.findIndex(t => t.id === item.id) + 1;
+      grid.appendChild(buildCard(item, globalIndex));
+    });
+    container.appendChild(group);
+  });
+
+  initScrollReveal();
+}
+
+/* =====================================================================
+   DASHBOARD
+   ===================================================================== */
+function updateDashboard(){
+  const total = TITLES.length;
+  const watchedCount = watched.size;
+  const remaining = total - watchedCount;
+  const percent = total ? Math.round((watchedCount / total) * 100) : 0;
+
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statWatched").textContent = watchedCount;
+  document.getElementById("statRemaining").textContent = remaining;
+  document.getElementById("statPercent").textContent = percent + "%";
+  document.getElementById("progressBarFill").style.width = percent + "%";
+}
+
+/* =====================================================================
+   FILTERS INIT
+   ===================================================================== */
+function populatePhaseFilter(){
+  const select = document.getElementById("phaseFilter");
+  PHASE_ORDER.forEach(phase => {
+    const opt = document.createElement("option");
+    opt.value = phase;
+    opt.textContent = phase;
+    select.appendChild(opt);
+  });
+}
+
+function initFilters(){
+  const searchInput = document.getElementById("searchInput");
+  const navSearchInput = document.getElementById("navSearchInput");
+  const phaseFilter = document.getElementById("phaseFilter");
+  const categoryFilter = document.getElementById("categoryFilter");
+  const sortFilter = document.getElementById("sortFilter");
+  const resetBtn = document.getElementById("resetFilters");
+
+  searchInput.addEventListener("input", (e) => {
+    state.search = e.target.value;
+    navSearchInput.value = e.target.value;
+    renderTimeline();
+  });
+
+  navSearchInput.addEventListener("input", (e) => {
+    state.search = e.target.value;
+    searchInput.value = e.target.value;
+    renderTimeline();
+  });
+
+  phaseFilter.addEventListener("change", (e) => {
+    state.phase = e.target.value;
+    renderTimeline();
+  });
+
+  categoryFilter.addEventListener("change", (e) => {
+    state.category = e.target.value;
+    renderTimeline();
+  });
+
+  sortFilter.addEventListener("change", (e) => {
+    state.sort = e.target.value;
+    renderTimeline();
+  });
+
+  resetBtn.addEventListener("click", () => {
+    state = { search:"", phase:"all", category:"all", sort:"asc" };
+    searchInput.value = "";
+    navSearchInput.value = "";
+    phaseFilter.value = "all";
+    categoryFilter.value = "all";
+    sortFilter.value = "asc";
+    renderTimeline();
+  });
+}
+
+/* =====================================================================
+   NAVBAR — sticky state, mobile menu, search toggle
+   ===================================================================== */
+function initNavbar(){
+  const navbar = document.getElementById("navbar");
+  window.addEventListener("scroll", () => {
+    navbar.classList.toggle("scrolled", window.scrollY > 40);
+  });
+
+  const hamburger = document.getElementById("hamburger");
+  hamburger.addEventListener("click", () => {
+    navbar.classList.toggle("menu-open");
+    hamburger.classList.toggle("active");
+  });
+
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+      navbar.classList.remove("menu-open");
+      hamburger.classList.remove("active");
+    });
+  });
+
+  const searchToggle = document.getElementById("searchToggle");
+  const navbarSearch = document.getElementById("navbarSearch");
+  searchToggle.addEventListener("click", () => {
+    navbarSearch.classList.toggle("open");
+    if(navbarSearch.classList.contains("open")){
+      document.getElementById("navSearchInput").focus();
+    }
+  });
+}
+
+/* =====================================================================
+   THEME TOGGLE (Dark / Cinema Light)
+   ===================================================================== */
+function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY);
+  if(saved === "light"){
+    document.body.classList.add("theme-light");
+  }
+
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    document.body.classList.toggle("theme-light");
+    const isLight = document.body.classList.contains("theme-light");
+    localStorage.setItem(THEME_KEY, isLight ? "light" : "dark");
+  });
+}
+
+/* =====================================================================
+   SCROLL REVEAL
+   ===================================================================== */
+let revealObserver;
+function initScrollReveal(){
+  if(!revealObserver){
+    revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add("in-view");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold:0.12 });
+  }
+  document.querySelectorAll(".reveal:not(.in-view)").forEach(el => revealObserver.observe(el));
+}
+
+/* =====================================================================
+   SCROLL TO TOP
+   ===================================================================== */
+function initScrollTop(){
+  const btn = document.getElementById("scrollTop");
+  window.addEventListener("scroll", () => {
+    btn.classList.toggle("visible", window.scrollY > 500);
+  });
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top:0, behavior:"smooth" });
+  });
+}
+
+/* =====================================================================
+   LOADING SCREEN
+   ===================================================================== */
+function initLoadingScreen(){
+  const screen = document.getElementById("loadingScreen");
+  const fill = document.getElementById("loadingBarFill");
+  let progress = 0;
+
+  const interval = setInterval(() => {
+    progress = Math.min(progress + Math.random() * 22, 100);
+    fill.style.width = progress + "%";
+    if(progress >= 100){
+      clearInterval(interval);
+      setTimeout(() => screen.classList.add("hidden"), 250);
+    }
+  }, 120);
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+function init(){
+  loadWatched();
+  populatePhaseFilter();
+  updateDashboard();
+  renderTimeline();
+  initFilters();
+  initNavbar();
+  initTheme();
+  initScrollTop();
+  initScrollReveal();
+  initLoadingScreen();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
+</body>
+</html>
