@@ -23,19 +23,13 @@
   --surface-2:#1F1F1F;
   --line:#2E2E2E;
   --line-soft:#242424;
+  --marvel-red:#ED1D24;
+  --red-deep:#A8141A;
+  --red-dim:#5C0D10;
   --white:#FFFFFF;
   --gray-100:#D4D4D4;
   --gray-300:#A3A3A3;
   --gray-500:#6E6E6E;
-
-  /* Accent theme (default: Marvel Red) — swappable via body[data-accent] */
-  --accent:#ED1D24;
-  --accent-deep:#A8141A;
-  --accent-soft:rgba(237,29,36,0.12);
-
-  /* Back-compat aliases used throughout the stylesheet */
-  --marvel-red:var(--accent);
-  --red-deep:var(--accent-deep);
 
   /* Type */
   --font-display:'Archivo Black', 'Arial Black', sans-serif;
@@ -62,11 +56,6 @@
   --border-color:var(--line);
 }
 
-body[data-accent="shield"]{ --accent:#1E5FBF; --accent-deep:#123C7A; --accent-soft:rgba(30,95,191,0.14); }
-body[data-accent="wakanda"]{ --accent:#7B2FF0; --accent-deep:#4E1B99; --accent-soft:rgba(123,47,240,0.14); }
-body[data-accent="tva"]{ --accent:#E8792E; --accent-deep:#A85419; --accent-soft:rgba(232,121,46,0.14); }
-body[data-accent="hydra"]{ --accent:#3E8E4F; --accent-deep:#255C31; --accent-soft:rgba(62,142,79,0.14); }
-
 /* Light ("Cinema Light") theme override */
 body.theme-light{
   --bg:#F3F3F1;
@@ -92,6 +81,27 @@ ul, ol{ list-style:none; }
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
 }
+
+/* =====================================================================
+   2b. ACCESSIBILITY — focus states & skip link
+   ===================================================================== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+.card:focus-visible{
+  outline:2px solid var(--marvel-red);
+  outline-offset:3px;
+  border-radius:4px;
+}
+.skip-link{
+  position:fixed; top:-60px; left:16px; z-index:10000;
+  background:var(--marvel-red); color:#fff;
+  padding:12px 20px; border-radius:var(--radius-sm);
+  font-family:var(--font-body); font-weight:700; font-size:13px;
+  transition:top var(--transition-fast);
+}
+.skip-link:focus{ top:16px; }
 
 /* =====================================================================
    3. BASE TYPOGRAPHY
@@ -264,35 +274,7 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   transition:background var(--transition-fast), color var(--transition-fast);
 }
 .icon-btn svg{ width:19px; height:19px; }
-.icon-btn:hover{ background:var(--accent-soft); color:var(--accent); }
-
-.theme-picker{ position:relative; }
-.theme-dropdown{
-  position:absolute; top:calc(100% + 10px); right:0;
-  background:var(--bg-elevated); border:1px solid var(--border-color);
-  border-radius:var(--radius-md); padding:8px;
-  display:flex; flex-direction:column; gap:2px;
-  min-width:170px;
-  opacity:0; visibility:hidden; transform:translateY(-6px);
-  transition:opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
-  box-shadow:0 20px 40px -14px rgba(0,0,0,0.5);
-  z-index:1100;
-}
-.theme-dropdown.open{ opacity:1; visibility:visible; transform:translateY(0); }
-.theme-option{
-  display:flex; align-items:center; gap:10px;
-  padding:9px 10px; border-radius:var(--radius-sm);
-  font-size:12.5px; font-weight:600; color:var(--text-secondary);
-  transition:background var(--transition-fast), color var(--transition-fast);
-  text-align:left; width:100%;
-}
-.theme-option:hover{ background:var(--accent-soft); color:var(--text-primary); }
-.swatch{ width:14px; height:14px; border-radius:50%; flex-shrink:0; }
-.swatch-marvel{ background:#ED1D24; }
-.swatch-shield{ background:#1E5FBF; }
-.swatch-wakanda{ background:#7B2FF0; }
-.swatch-tva{ background:#E8792E; }
-.swatch-hydra{ background:#3E8E4F; }
+.icon-btn:hover{ background:rgba(237,29,36,0.12); color:var(--marvel-red); }
 
 .hamburger{
   display:none;
@@ -327,6 +309,7 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
 .hero{
   position:relative;
   min-height:100vh;
+  min-height:100dvh;
   display:flex; align-items:center; justify-content:center;
   overflow:hidden;
   background:var(--black);
@@ -336,8 +319,8 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
 .hero-grid{
   position:absolute; inset:-2px;
   background-image:
-    linear-gradient(var(--accent-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--accent-soft) 1px, transparent 1px);
+    linear-gradient(rgba(237,29,36,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237,29,36,0.08) 1px, transparent 1px);
   background-size:56px 56px;
   animation:gridDrift 24s linear infinite;
   opacity:.5;
@@ -346,38 +329,11 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   0%{ transform:translate(0,0); }
   100%{ transform:translate(56px,56px); }
 }
-.hero-halftone{
-  position:absolute; inset:0;
-  background-image:radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size:5px 5px;
-  opacity:.35;
-  mix-blend-mode:overlay;
+.hero-sweep{
+  position:absolute; top:0; bottom:0; width:36%;
+  background:linear-gradient(100deg, transparent, rgba(237,29,36,0.10), transparent);
+  animation:sweep 9s ease-in-out infinite;
 }
-.hero-particles{ position:absolute; inset:0; overflow:hidden; }
-.particle{
-  position:absolute;
-  border-radius:50%;
-  background:var(--accent);
-  opacity:0;
-  filter:blur(0.5px);
-  animation-name:particleFloat;
-  animation-timing-function:ease-in-out;
-  animation-iteration-count:infinite;
-}
-@keyframes particleFloat{
-  0%{ opacity:0; transform:translateY(0) scale(0.6); }
-  15%{ opacity:.55; }
-  50%{ opacity:.35; transform:translateY(-120px) scale(1); }
-  85%{ opacity:.15; }
-  100%{ opacity:0; transform:translateY(-260px) scale(0.6); }
-}
-.hero-sweep, .hero-streak{
-  position:absolute; top:0; bottom:0; width:30%;
-  background:linear-gradient(100deg, transparent, var(--accent-soft), transparent);
-}
-.hero-sweep{ width:36%; animation:sweep 9s ease-in-out infinite; }
-.hero-streak-1{ animation:sweep 14s ease-in-out infinite; animation-delay:2s; opacity:.6; }
-.hero-streak-2{ animation:sweep 19s ease-in-out infinite reverse; animation-delay:5s; opacity:.4; }
 @keyframes sweep{
   0%{ left:-40%; }
   50%{ left:70%; }
@@ -445,7 +401,7 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   transition:border-color var(--transition-fast), transform var(--transition-fast);
 }
 .stat-card:hover{ border-color:var(--marvel-red); transform:translateY(-3px); }
-.stat-card-accent{ border-color:var(--accent); background:linear-gradient(160deg, var(--accent-soft), transparent 70%), var(--bg-elevated); }
+.stat-card-accent{ border-color:var(--marvel-red); background:linear-gradient(160deg, rgba(237,29,36,0.10), transparent 70%), var(--bg-elevated); }
 
 .stat-label{
   font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
@@ -494,38 +450,12 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   flex-direction:row; align-items:center; gap:10px;
   background:var(--surface-2); border:1px solid var(--border-color);
   border-radius:var(--radius-sm); padding:0 14px;
-  position:relative;
 }
 .filter-search svg{ width:17px; height:17px; color:var(--text-secondary); flex-shrink:0; }
 .filter-search input{
   flex:1; background:transparent; border:none; padding:12px 0; color:var(--text-primary);
 }
 .filter-search input:focus{ outline:none; }
-
-.autocomplete-dropdown{
-  position:absolute; top:calc(100% + 8px); left:0; right:0;
-  background:var(--bg-elevated); border:1px solid var(--border-color);
-  border-radius:var(--radius-md); overflow:hidden;
-  opacity:0; visibility:hidden; transform:translateY(-6px);
-  transition:opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
-  box-shadow:0 20px 44px -16px rgba(0,0,0,0.55);
-  z-index:1050;
-  max-height:320px; overflow-y:auto;
-}
-.autocomplete-dropdown.open{ opacity:1; visibility:visible; transform:translateY(0); }
-.autocomplete-item{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:11px 16px;
-  font-size:13px; color:var(--text-secondary);
-  cursor:pointer;
-  border-bottom:1px solid var(--line-soft);
-  transition:background var(--transition-fast);
-}
-.autocomplete-item:last-child{ border-bottom:none; }
-.autocomplete-item:hover, .autocomplete-item.active{ background:var(--accent-soft); color:var(--text-primary); }
-.autocomplete-item mark{ background:none; color:var(--accent); font-weight:700; }
-.autocomplete-item-year{ font-family:var(--font-mono); font-size:10.5px; color:var(--gray-500); flex-shrink:0; }
-.autocomplete-empty{ padding:14px 16px; font-size:12.5px; color:var(--gray-500); }
 
 .filters-meta{
   margin-top:14px; font-family:var(--font-mono); font-size:11.5px; color:var(--text-secondary);
@@ -545,8 +475,8 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
 }
 .phase-header::before{
   content:""; position:absolute; left:0; top:2px; width:10px; height:10px;
-  border-radius:50%; background:var(--accent);
-  box-shadow:0 0 0 4px var(--accent-soft);
+  border-radius:50%; background:var(--marvel-red);
+  box-shadow:0 0 0 4px rgba(237,29,36,0.18);
 }
 .phase-header-title{
   font-family:var(--font-display); font-size:19px; letter-spacing:.03em; text-transform:uppercase;
@@ -568,170 +498,110 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
 }
 
 /* =====================================================================
-   12. CARD (flip card: front = poster panel, back = detail panel)
+   12. CARD
    ===================================================================== */
 .card{
-  perspective:1400px;
-  height:200px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-color);
+  border-radius:var(--radius-md);
+  padding:0;
+  transition:border-color var(--transition-med), background var(--transition-med);
+  position:relative;
   cursor:pointer;
 }
-.card-inner{
-  position:relative;
-  width:100%; height:100%;
-  transition:transform 620ms cubic-bezier(.3,.1,.2,1);
-  transform-style:preserve-3d;
-  will-change:transform;
+.card:hover{
+  border-color:var(--marvel-red);
+  background:linear-gradient(90deg, rgba(237,29,36,0.06), transparent 60%), var(--bg-elevated);
+  box-shadow:0 14px 30px -18px rgba(0,0,0,0.55);
 }
-.card:hover .card-inner,
-.card.is-flipped .card-inner{
-  transform:rotateY(180deg);
-}
+.card.is-watched{ border-color:rgba(237,29,36,0.35); }
 
-.card-face{
-  position:absolute; inset:0;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  border-radius:var(--radius-md);
-  border:1px solid var(--border-color);
-  background:var(--bg-elevated);
-  overflow:hidden;
+.card-row{
   display:flex;
-  transition:border-color var(--transition-med);
+  align-items:center;
+  gap:18px;
+  padding:18px 22px;
+  transition:transform var(--transition-fast);
 }
-.card.is-watched .card-face{ border-color:var(--accent-soft); }
-.card:hover .card-face{ border-color:var(--accent); }
+.card:hover .card-row{ transform:translateX(4px); }
 
-/* ---- FRONT ---- */
-.card-front{ align-items:stretch; }
-.card-poster{
-  width:130px; flex-shrink:0;
-  position:relative;
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden;
-}
-.card-poster::before{
-  content:""; position:absolute; inset:0;
-  background-repeat:repeat-y; background-size:6px 14px; background-position:top left;
-  background-image:repeating-linear-gradient(0deg, rgba(255,255,255,0.16) 0 6px, transparent 6px 14px);
-  width:6px; left:0;
-}
-.card-poster::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(90deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
-}
-.poster-monogram{
-  position:relative; z-index:1;
-  font-family:var(--font-display);
-  font-size:clamp(28px, 6vw, 40px);
-  color:rgba(255,255,255,0.95);
-  text-align:center;
-  line-height:1;
-}
-.card-index-badge{
-  position:absolute; top:10px; left:12px; z-index:2;
-  font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,0.8);
+.card-index{
+  font-family:var(--font-mono);
+  font-size:15px;
+  color:var(--marvel-red);
+  min-width:34px;
+  flex-shrink:0;
+  text-align:right;
 }
 
-.card-front-info{
-  flex:1; min-width:0;
-  display:flex; flex-direction:column; justify-content:center; gap:8px;
-  padding:18px 20px;
-}
+.card-main{ flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+
 .card-title{
   font-family:var(--font-display);
-  font-size:16px;
+  font-size:16.5px;
   letter-spacing:.01em;
   line-height:1.3;
   text-transform:uppercase;
 }
 .card.is-watched .card-title{ color:var(--text-secondary); }
+
 .card-info-row{
-  display:flex; gap:12px; flex-wrap:wrap; align-items:center;
-  font-family:var(--font-mono); font-size:10.5px; color:var(--text-secondary);
+  display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+  font-family:var(--font-mono); font-size:11px; color:var(--text-secondary);
 }
 .unreleased-tag{
   font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--accent); border:1px solid var(--accent-soft); padding:2px 8px; border-radius:20px;
-}
-.flip-hint{
-  font-family:var(--font-mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase;
-  color:var(--gray-500); margin-top:2px;
+  color:var(--marvel-red); border:1px solid rgba(237,29,36,0.4); padding:2px 8px; border-radius:20px;
 }
 
-.card-expand-btn{
-  position:absolute; top:10px; right:10px; z-index:3;
-  width:28px; height:28px; border-radius:50%;
+.card-chevron{
+  flex-shrink:0;
+  width:26px; height:26px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  background:rgba(0,0,0,0.45);
-  color:#fff;
-  border:1px solid rgba(255,255,255,0.25);
-  opacity:0; transition:opacity var(--transition-fast), background var(--transition-fast);
+  color:var(--text-secondary);
+  border:1px solid var(--border-color);
+  transition:transform var(--transition-med), color var(--transition-fast), border-color var(--transition-fast);
 }
-.card-face:hover .card-expand-btn{ opacity:1; }
-.card-expand-btn:hover{ background:var(--accent); }
-.card-expand-btn svg{ width:13px; height:13px; }
+.card-chevron svg{ width:13px; height:13px; }
+.card:hover .card-chevron{ color:var(--marvel-red); border-color:var(--marvel-red); }
+.card.is-expanded .card-chevron{ transform:rotate(180deg); }
 
-/* ---- BACK ---- */
-.card-back{
-  transform:rotateY(180deg);
-  flex-direction:column;
-  padding:16px 20px;
-  gap:8px;
-  justify-content:space-between;
+.card-desc-wrap{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 380ms var(--ease), padding var(--transition-med);
+  padding:0 22px;
 }
-.card-back-top{ display:flex; flex-direction:column; gap:6px; }
-.card-back-title{
-  font-family:var(--font-display); font-size:13.5px; text-transform:uppercase; letter-spacing:.01em;
+.card.is-expanded .card-desc-wrap{
+  max-height:160px;
+  padding:0 22px 20px;
 }
-.card-back-synopsis{
-  font-size:11.8px; line-height:1.5; color:var(--text-secondary);
-  overflow-y:auto;
-  max-height:78px;
-  padding-right:4px;
+.card-desc{
+  font-size:13px;
+  line-height:1.65;
+  color:var(--text-secondary);
+  padding-top:14px;
+  border-top:1px solid var(--line-soft);
+  max-width:640px;
 }
-.card-back-footer{ display:flex; gap:8px; align-items:center; }
 
-/* ---- Poster gradient variants (deterministic, original — not artwork) ---- */
-.grad-0{ background:linear-gradient(155deg, #1A1A1A 0%, #3A0709 55%, var(--accent) 130%); }
-.grad-1{ background:linear-gradient(160deg, #0A0A0A 0%, #2E2E2E 60%, var(--accent) 140%); }
-.grad-2{ background:linear-gradient(145deg, var(--accent) -20%, #1A1A1A 55%, #000 120%); }
-.grad-3{ background:linear-gradient(170deg, #2E2E2E 0%, #0A0A0A 65%, var(--accent-deep) 150%); }
-.grad-4{ background:linear-gradient(135deg, #000 0%, var(--accent-deep) 70%, #2E2E2E 140%); }
-.grad-5{ background:linear-gradient(160deg, #3D3D3D 0%, #0A0A0A 50%, var(--accent) 150%); }
-.grad-6{ background:linear-gradient(150deg, var(--accent) -10%, #3D3D3D 60%, #000 130%); }
-.grad-7{ background:linear-gradient(165deg, #1A1A1A 0%, var(--accent-deep) 55%, #3D3D3D 140%); }
-
-/* ---- Watch button (used on card back and in modal) ---- */
 .watch-btn{
   flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; gap:6px;
-  padding:9px 14px;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 18px;
   border:1.5px solid var(--border-color);
   border-radius:var(--radius-sm);
-  font-size:10.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+  font-size:11.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
   color:var(--text-primary);
   transition:all var(--transition-fast);
   white-space:nowrap;
 }
-.watch-btn svg{ width:12px; height:12px; opacity:0; transition:opacity var(--transition-fast); flex-shrink:0; }
-.watch-btn:hover{ border-color:var(--accent); color:var(--accent); }
-.watch-btn.watched{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.watch-btn svg{ width:14px; height:14px; opacity:0; transition:opacity var(--transition-fast); flex-shrink:0; }
+.watch-btn:hover{ border-color:var(--marvel-red); color:var(--marvel-red); }
+.watch-btn.watched{
+  background:var(--marvel-red); border-color:var(--marvel-red); color:#fff;
+}
 .watch-btn.watched svg{ opacity:1; }
-
-/* ---- Ripple (trailer button) ---- */
-.ripple{
-  position:absolute; border-radius:50%;
-  background:rgba(255,255,255,0.5);
-  transform:scale(0);
-  animation:rippleAnim 550ms ease-out;
-  pointer-events:none;
-}
-@keyframes rippleAnim{
-  to{ transform:scale(2.6); opacity:0; }
-}
-.btn-trailer{ position:relative; overflow:hidden; padding:12px 22px; gap:8px; font-size:12px; }
-.btn-trailer svg{ width:13px; height:13px; }
-.btn-trailer.disabled{ opacity:.45; pointer-events:none; }
 
 /* =====================================================================
    13. EMPTY STATE
@@ -740,84 +610,6 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   text-align:center; color:var(--text-secondary); font-family:var(--font-mono);
   font-size:13px; padding:40px 0;
 }
-
-/* =====================================================================
-   13b. NEXT-UP BANNER + MODAL
-   ===================================================================== */
-.next-up-banner{
-  margin-top:22px;
-  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-  padding:16px 20px;
-  border:1px solid var(--border-color);
-  border-radius:var(--radius-md);
-  background:linear-gradient(90deg, var(--accent-soft), transparent 70%), var(--bg-elevated);
-}
-.next-up-label{
-  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--accent);
-}
-.next-up-title{ font-family:var(--font-display); font-size:15px; text-transform:uppercase; letter-spacing:.01em; }
-.stat-value-sm{ font-size:20px; }
-
-.modal-backdrop{
-  position:fixed; inset:0; z-index:2000;
-  background:rgba(0,0,0,0.72);
-  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-  display:flex; align-items:center; justify-content:center;
-  padding:24px;
-  opacity:0; visibility:hidden;
-  transition:opacity var(--transition-med), visibility var(--transition-med);
-}
-.modal-backdrop.open{ opacity:1; visibility:visible; }
-.modal-panel{
-  width:100%; max-width:640px;
-  background:var(--bg-elevated);
-  border:1px solid var(--border-color);
-  border-radius:var(--radius-lg);
-  overflow:hidden;
-  transform:scale(0.94) translateY(10px);
-  transition:transform var(--transition-med);
-  max-height:88vh;
-  display:flex; flex-direction:column;
-}
-.modal-backdrop.open .modal-panel{ transform:scale(1) translateY(0); }
-.modal-close{
-  position:absolute; top:16px; right:16px; z-index:2;
-  width:34px; height:34px; border-radius:50%;
-  background:rgba(0,0,0,0.5); color:#fff;
-  display:flex; align-items:center; justify-content:center;
-  border:1px solid rgba(255,255,255,0.2);
-  transition:background var(--transition-fast);
-}
-.modal-close:hover{ background:var(--accent); }
-.modal-close svg{ width:15px; height:15px; }
-.modal-poster{
-  position:relative;
-  height:150px;
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0;
-}
-.modal-poster::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(0,0,0,0) 40%, var(--bg-elevated) 100%);
-}
-.modal-poster .poster-monogram{ font-size:clamp(38px, 8vw, 56px); position:relative; z-index:1; }
-.modal-body{ padding:0 28px 28px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
-.modal-phase{
-  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent);
-}
-.modal-title{ font-family:var(--font-display); font-size:22px; text-transform:uppercase; letter-spacing:.01em; line-height:1.2; }
-.modal-meta{
-  display:flex; gap:14px; flex-wrap:wrap;
-  font-family:var(--font-mono); font-size:11.5px; color:var(--text-secondary);
-}
-.modal-ratings{ display:flex; gap:16px; flex-wrap:wrap; }
-.modal-rating-item{ display:flex; flex-direction:column; gap:2px; }
-.modal-rating-label{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--gray-500); }
-.modal-rating-value{ font-family:var(--font-mono); font-size:15px; color:var(--text-primary); }
-.modal-synopsis{ font-size:14px; line-height:1.7; color:var(--text-secondary); }
-.modal-actions{ display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
-.modal-watch-btn{ padding:12px 20px; font-size:11.5px; }
 
 /* =====================================================================
    14. FOOTER
@@ -838,7 +630,7 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   display:flex; align-items:center; justify-content:center;
   opacity:0; visibility:hidden; transform:translateY(10px);
   transition:opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
-  box-shadow:0 10px 26px -10px var(--accent-soft);
+  box-shadow:0 10px 26px -10px rgba(237,29,36,0.6);
 }
 .scroll-top.visible{ opacity:1; visibility:visible; transform:translateY(0); }
 .scroll-top svg{ width:18px; height:18px; }
@@ -867,21 +659,23 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   .filters-bar{ flex-direction:column; align-items:stretch; }
   .filter-field select{ width:100%; }
 
-  .card{ height:auto; min-height:210px; }
-  .card-inner{ height:100%; }
-  .card-front, .card-back{ flex-direction:column; }
-  .card-poster{ width:100%; height:70px; }
-  .card-poster::before{ width:100%; height:6px; left:0; top:0;
-    background-repeat:repeat-x; background-size:14px 6px;
-    background-image:repeating-linear-gradient(90deg, rgba(255,255,255,0.16) 0 6px, transparent 6px 14px); }
-  .card-front-info{ padding:12px 16px; }
-  .card-back{ padding:14px 16px; }
-  .card-back-synopsis{ max-height:none; }
+  .card-row{ flex-wrap:wrap; padding:16px 18px; }
+  .card-index{ text-align:left; min-width:auto; order:1; }
+  .card-main{ order:2; width:100%; }
+  .card-chevron{ order:3; }
+  .watch-btn{ order:4; width:100%; margin-top:4px; }
+  .card-desc{ padding-left:0; }
 }
 
 </style>
 </head>
 <body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<noscript>
+  <style>.loading-screen{ display:none !important; }</style>
+</noscript>
 
 <!-- ============================= -->
 <!-- LOADING SCREEN                -->
@@ -909,25 +703,13 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
     </nav>
 
     <div class="navbar-actions">
-      <button class="icon-btn" id="searchToggle" aria-label="Search titles">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button class="icon-btn" id="searchToggle" aria-label="Search titles" aria-expanded="false" aria-controls="navbarSearch">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
       <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
-        <svg viewBox="0 0 24 24" fill="none" id="themeIcon"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" id="themeIcon" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <div class="theme-picker">
-        <button class="icon-btn" id="paletteToggle" aria-label="Choose accent theme">
-          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="8" r="1.4" fill="currentColor"/><circle cx="8.5" cy="13" r="1.4" fill="currentColor"/><circle cx="15.5" cy="13" r="1.4" fill="currentColor"/></svg>
-        </button>
-        <div class="theme-dropdown" id="themeDropdown">
-          <button class="theme-option" data-accent="marvel"><span class="swatch swatch-marvel"></span>Marvel Red</button>
-          <button class="theme-option" data-accent="shield"><span class="swatch swatch-shield"></span>SHIELD Blue</button>
-          <button class="theme-option" data-accent="wakanda"><span class="swatch swatch-wakanda"></span>Wakanda Purple</button>
-          <button class="theme-option" data-accent="tva"><span class="swatch swatch-tva"></span>TVA Orange</button>
-          <button class="theme-option" data-accent="hydra"><span class="swatch swatch-hydra"></span>Hydra Green</button>
-        </div>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -938,6 +720,8 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   </div>
 </header>
 
+<main id="main-content">
+
 <!-- ============================= -->
 <!-- HERO                          -->
 <!-- ============================= -->
@@ -945,10 +729,6 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   <div class="hero-bg" aria-hidden="true">
     <div class="hero-grid"></div>
     <div class="hero-sweep"></div>
-    <div class="hero-halftone"></div>
-    <div class="hero-particles" id="heroParticles"></div>
-    <div class="hero-streak hero-streak-1"></div>
-    <div class="hero-streak hero-streak-2"></div>
   </div>
   <div class="hero-overlay"></div>
 
@@ -984,41 +764,20 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
     <div class="dashboard-grid reveal" data-reveal>
       <div class="stat-card">
         <span class="stat-label">Total Titles</span>
-        <span class="stat-value" id="statTotal" data-count="0">0</span>
+        <span class="stat-value" id="statTotal">0</span>
       </div>
       <div class="stat-card stat-card-accent">
         <span class="stat-label">Watched</span>
-        <span class="stat-value" id="statWatched" data-count="0">0</span>
+        <span class="stat-value" id="statWatched">0</span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Remaining</span>
-        <span class="stat-value" id="statRemaining" data-count="0">0</span>
+        <span class="stat-value" id="statRemaining">0</span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Completion</span>
         <span class="stat-value" id="statPercent">0%</span>
       </div>
-      <div class="stat-card">
-        <span class="stat-label">Movies</span>
-        <span class="stat-value" id="statMovies" data-count="0">0</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Disney+ Series</span>
-        <span class="stat-value" id="statSeries" data-count="0">0</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Total Runtime</span>
-        <span class="stat-value stat-value-sm" id="statRuntime">0h</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">Favorite Phase</span>
-        <span class="stat-value stat-value-sm" id="statFavPhase">—</span>
-      </div>
-    </div>
-
-    <div class="next-up-banner reveal" data-reveal id="nextUpBanner">
-      <span class="next-up-label">Next Up</span>
-      <span class="next-up-title" id="nextUpTitle">You're all caught up</span>
     </div>
 
     <div class="progress-bar-wrap reveal" data-reveal>
@@ -1036,9 +795,8 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   <div class="section-inner">
     <div class="filters-bar reveal" data-reveal>
       <div class="filter-field filter-search">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input type="text" id="searchInput" placeholder="Search by title…" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list">
-        <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by title…" autocomplete="off">
       </div>
 
       <div class="filter-field">
@@ -1089,6 +847,8 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   <p class="empty-state" id="emptyState" hidden>No titles match your filters. Try resetting them.</p>
 </section>
 
+</main>
+
 <!-- ============================= -->
 <!-- FOOTER                        -->
 <!-- ============================= -->
@@ -1107,220 +867,153 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
 <!-- SCROLL TO TOP                 -->
 <!-- ============================= -->
 <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
-  <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="19" x2="12" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="5 12 12 5 19 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="5 12 12 5 19 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
-
-<!-- ============================= -->
-<!-- DETAIL MODAL                  -->
-<!-- ============================= -->
-<div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal-panel" id="modalPanel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="modal-close" id="modalClose" aria-label="Close">
-      <svg viewBox="0 0 24 24" fill="none"><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
-    <div class="modal-poster" id="modalPoster"></div>
-    <div class="modal-body">
-      <span class="modal-phase" id="modalPhase"></span>
-      <h3 class="modal-title" id="modalTitle"></h3>
-      <div class="modal-meta" id="modalMeta"></div>
-      <div class="modal-ratings" id="modalRatings"></div>
-      <p class="modal-synopsis" id="modalSynopsis"></p>
-      <div class="modal-actions">
-        <a class="btn btn-primary btn-trailer" id="modalTrailer" target="_blank" rel="noopener noreferrer">
-          <svg viewBox="0 0 24 24" fill="none"><polygon points="6 4 20 12 6 20" fill="currentColor"/></svg>
-          Watch Trailer
-        </a>
-        <button class="watch-btn modal-watch-btn" id="modalWatchBtn">
-          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>Mark as Watched</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 /* =====================================================================
    DATA
-   Original, factual reference data. Synopses are written in-house —
-   not copied from marketing copy, Wikipedia, or any other source.
-   runtimeMin is used for the "Total Runtime" stat (movies/specials only).
-   =====================================================================
-*/
+   Original, factual reference data (titles/dates/phases/categories).
+   Synopses are written in-house — not sourced from marketing copy.
+   ===================================================================== */
 const TITLES = [
-  { id:"iron-man", title:"Iron Man", date:"2008-05-02", displayDate:"May 2, 2008", runtime:"126 min", runtimeMin:126, phase:"Phase One", category:"movie",
-    synopsis:"After being held captive by terrorists in Afghanistan, billionaire weapons manufacturer Tony Stark builds a suit of powered armor to escape captivity. Back home, he refines the technology into the Iron Man suit and begins secretly protecting the world from the same conflicts his company once profited from. When a business partner steals damaged reactor technology to build a rival suit, Stark must confront the consequences of his old arms-dealing empire." },
-  { id:"incredible-hulk", title:"The Incredible Hulk", date:"2008-06-13", displayDate:"June 13, 2008", runtime:"112 min", runtimeMin:112, phase:"Phase One", category:"movie",
-    synopsis:"Bruce Banner has spent years on the run, hiding from the U.S. military after a botched experiment left him transforming into a giant, uncontrollable creature whenever his heart rate spikes. Desperate for a cure, he tracks down leads in South America and eventually returns to the United States, pursued by a general determined to weaponize the same technology that created him." },
-  { id:"iron-man-2", title:"Iron Man 2", date:"2010-05-07", displayDate:"May 7, 2010", runtime:"124 min", runtimeMin:124, phase:"Phase One", category:"movie",
-    synopsis:"With his identity as Iron Man now public, Tony Stark faces mounting pressure from the U.S. government to hand over his armor technology, all while the palladium powering his chest reactor slowly poisons him. A vengeful physicist whose father once worked alongside Stark's builds a rival suit for revenge, while a competing industrialist tries to exploit the situation for military contracts." },
-  { id:"thor", title:"Thor", date:"2011-05-06", displayDate:"May 6, 2011", runtime:"115 min", runtimeMin:115, phase:"Phase One", category:"movie",
-    synopsis:"Crown prince of Asgard, Thor is banished to Earth by his father after his reckless arrogance nearly ignites a war with a rival realm. Stripped of his powers and his hammer, he must learn humility while living among humans and forming an alliance with an astrophysicist studying strange atmospheric phenomena, even as his brother Loki's ambitions back home threaten to unravel the throne itself." },
-  { id:"cap-first-avenger", title:"Captain America: The First Avenger", date:"2011-07-22", displayDate:"July 22, 2011", runtime:"124 min", runtimeMin:124, phase:"Phase One", category:"movie",
-    synopsis:"Frail but determined, Steve Rogers volunteers for an experimental military program during World War II and emerges as a physically enhanced super-soldier. As Captain America, he's thrust into the fight against a Nazi-splinter science division bent on using otherworldly technology to reshape the war, setting in motion events that will echo for decades." },
-  { id:"avengers", title:"The Avengers", date:"2012-05-04", displayDate:"May 4, 2012", runtime:"143 min", runtimeMin:143, phase:"Phase One", category:"movie",
-    synopsis:"When the exiled Asgardian Loki strikes a bargain with an alien army in exchange for the throne of Earth, spymaster Nick Fury activates the Avengers Initiative, pulling together Iron Man, Captain America, Thor, the Hulk, Black Widow, and Hawkeye. The team must overcome their differences to defend New York City from a full-scale invasion." },
-  { id:"iron-man-3", title:"Iron Man 3", date:"2013-05-03", displayDate:"May 3, 2013", runtime:"130 min", runtimeMin:130, phase:"Phase Two", category:"movie",
-    synopsis:"Still processing the trauma of the alien invasion he barely survived, Tony Stark spirals into anxiety and insomnia even as a terrorist calling himself the Mandarin launches a string of attacks on U.S. soil. Cut off from his usual technology, Stark is forced to rely on ingenuity alone to uncover a conspiracy involving a biotech firm and a shadowy program." },
-  { id:"thor-dark-world", title:"Thor: The Dark World", date:"2013-11-08", displayDate:"Nov 8, 2013", runtime:"112 min", runtimeMin:112, phase:"Phase Two", category:"movie",
-    synopsis:"An ancient race of Dark Elves awakens with a plan to plunge the universe into eternal night using a weapon that has unexpectedly bonded with Thor's love interest, Jane Foster. To stop them, Thor is forced to break his imprisoned brother Loki out of an Asgardian cell and stage an uneasy alliance, one whose fragile trust is tested as the stakes escalate." },
-  { id:"cap-winter-soldier", title:"Captain America: The Winter Soldier", date:"2014-04-04", displayDate:"April 4, 2014", runtime:"136 min", runtimeMin:136, phase:"Phase Two", category:"movie",
-    synopsis:"Now working for the intelligence agency S.H.I.E.L.D., Steve Rogers uncovers a decades-old conspiracy that has quietly infiltrated the organization from within. Hunted by his own allies and a lethal, amnesiac assassin known as the Winter Soldier, he must decide who he can still trust as the fallout exposes secrets that upend the balance of power." },
-  { id:"gotg-1", title:"Guardians of the Galaxy", date:"2014-08-01", displayDate:"Aug 1, 2014", runtime:"121 min", runtimeMin:121, phase:"Phase Two", category:"movie",
-    synopsis:"Small-time thief Peter Quill steals a mysterious orb and finds himself the target of a ruthless warlord's forces. To survive, he reluctantly teams up with a deadly assassin, a vengeful warrior, a talking raccoon, and a tree-like humanoid, forming a band of misfit outlaws who must decide whether to save the galaxy or cash in and walk away." },
-  { id:"avengers-aou", title:"Avengers: Age of Ultron", date:"2015-05-01", displayDate:"May 1, 2015", runtime:"141 min", runtimeMin:141, phase:"Phase Two", category:"movie",
-    synopsis:"Hoping to create an artificial intelligence that could protect the world in their place, Tony Stark and Bruce Banner instead accidentally unleash Ultron, a rogue peacekeeping program convinced that humanity's extinction is the only path to peace. As Ultron builds an army of robotic bodies, the Avengers face internal fractures and two new enhanced individuals swept up in the chaos." },
-  { id:"ant-man", title:"Ant-Man", date:"2015-07-17", displayDate:"July 17, 2015", runtime:"117 min", runtimeMin:117, phase:"Phase Two", category:"movie",
-    synopsis:"Recently released ex-convict Scott Lang is recruited by scientist Hank Pym to wear a suit that can shrink him to the size of an insect. Training under Pym's estranged daughter, Hope, Lang must master the technology in time to steal a rival version of the suit before it's weaponized, as old family wounds resurface along the way." },
-  { id:"agent-carter-s1", title:"Agent Carter", date:"2015-01-06", displayDate:"Jan 6, 2015", runtime:"8 Episodes", runtimeMin:null, phase:"Phase Two", category:"series",
-    synopsis:"In 1946, Peggy Carter is relegated to secretarial work at the Strategic Scientific Reserve despite her wartime heroics, her contributions overlooked by male colleagues. When a friend is falsely accused of treason, Peggy secretly investigates on her own, using skills the agency refuses to recognize to clear his name and expose a deeper conspiracy." },
-  { id:"cap-civil-war", title:"Captain America: Civil War", date:"2016-05-06", displayDate:"May 6, 2016", runtime:"147 min", runtimeMin:147, phase:"Phase Three", category:"movie",
-    synopsis:"A string of collateral damage from the Avengers' missions prompts a global push to place enhanced individuals under government oversight. The team splinters over the decision, pitting Iron Man's support for accountability against Captain America's distrust of political control, especially once his old friend Bucky Barnes is framed for a bombing." },
-  { id:"doctor-strange", title:"Doctor Strange", date:"2016-11-04", displayDate:"Nov 4, 2016", runtime:"115 min", runtimeMin:115, phase:"Phase Three", category:"movie",
-    synopsis:"A brilliant but arrogant surgeon, Stephen Strange loses the use of his hands in a car accident and travels the world seeking a cure. Instead, he finds a hidden order of sorcerers who teach him to manipulate reality, and he's quickly thrust into a battle against a former student turned zealot intent on merging Earth with a dark, timeless dimension." },
-  { id:"gotg-2", title:"Guardians of the Galaxy Vol. 2", date:"2017-05-05", displayDate:"May 5, 2017", runtime:"136 min", runtimeMin:136, phase:"Phase Three", category:"movie",
-    synopsis:"After a job goes sideways, the Guardians find themselves rescued by a charismatic stranger who claims to be Peter Quill's long-lost father. As Quill grapples with a chance to know his origins, cracks form within the team over loyalty and family, and what they uncover about his father's true nature forces them into a devastating choice." },
-  { id:"spiderman-homecoming", title:"Spider-Man: Homecoming", date:"2017-07-07", displayDate:"July 7, 2017", runtime:"133 min", runtimeMin:133, phase:"Phase Three", category:"movie",
-    synopsis:"Eager to prove himself after a taste of life among the Avengers, teenager Peter Parker juggles high school, a crush on a classmate, and his secret identity as Spider-Man. When he stumbles onto a black-market operation selling weapons built from salvaged alien technology, he takes matters into his own hands against the wishes of his mentor, Tony Stark." },
-  { id:"thor-ragnarok", title:"Thor: Ragnarok", date:"2017-11-03", displayDate:"Nov 3, 2017", runtime:"130 min", runtimeMin:130, phase:"Phase Three", category:"movie",
-    synopsis:"Stripped of his hammer and imprisoned on a distant, gladiatorial planet, Thor must fight his way free — including a forced bout against his old ally the Hulk — to return home. There, his long-forgotten sister Hela has seized the Asgardian throne and set in motion the prophesied destruction of their world." },
-  { id:"black-panther", title:"Black Panther", date:"2018-02-16", displayDate:"Feb 16, 2018", runtime:"134 min", runtimeMin:134, phase:"Phase Three", category:"movie",
-    synopsis:"Following his father's death, T'Challa returns to the isolated, technologically advanced nation of Wakanda to assume the throne as its new king and protector, the Black Panther. His rule is challenged by an estranged relative with a violent vision for how Wakanda should use its power on the world stage." },
-  { id:"infinity-war", title:"Avengers: Infinity War", date:"2018-04-27", displayDate:"April 27, 2018", runtime:"149 min", runtimeMin:149, phase:"Phase Three", category:"movie",
-    synopsis:"The Mad Titan Thanos begins a systematic quest to collect all six Infinity Stones, artifacts capable of reshaping existence, in order to erase half of all life in the universe. Every hero across Earth and the cosmos converges in a desperate, multi-front effort to stop him — one that ends in devastating failure." },
-  { id:"ant-man-wasp", title:"Ant-Man and the Wasp", date:"2018-07-06", displayDate:"July 6, 2018", runtime:"118 min", runtimeMin:118, phase:"Phase Three", category:"movie",
-    synopsis:"While under house arrest following the events of Civil War, Scott Lang is pulled back into action by Hank Pym and Hope van Dyne, now fighting alongside him as the Wasp. Together they race to rescue Hope's mother, who has been trapped in the microscopic Quantum Realm for decades, while evading a black-market dealer and an unstable new adversary." },
-  { id:"captain-marvel", title:"Captain Marvel", date:"2019-03-08", displayDate:"March 8, 2019", runtime:"124 min", runtimeMin:124, phase:"Phase Three", category:"movie",
-    synopsis:"Air Force pilot Carol Danvers wakes up with no memory of her past and extraordinary cosmic powers, caught in the middle of a decades-long war between two alien civilizations. Teaming up with a young S.H.I.E.L.D. agent named Nick Fury, she uncovers a buried history that reframes everything she thought she knew about which side she should be fighting for." },
-  { id:"endgame", title:"Avengers: Endgame", date:"2019-04-26", displayDate:"April 26, 2019", runtime:"181 min", runtimeMin:181, phase:"Phase Three", category:"movie",
-    synopsis:"Reeling from Thanos's decimation of half of all life, the surviving Avengers reunite around a desperate plan: traveling back through their own history to retrieve the Infinity Stones before Thanos can, and reverse the damage. The mission forces each hero to confront old choices and personal losses in their final stand." },
-  { id:"far-from-home", title:"Spider-Man: Far From Home", date:"2019-07-02", displayDate:"July 2, 2019", runtime:"129 min", runtimeMin:129, phase:"Phase Three", category:"movie",
-    synopsis:"Hoping for a quiet European class trip after the chaos of recent events, Peter Parker instead finds himself recruited by Nick Fury to help a mysterious new hero called Mysterio battle creatures made of the elements. As the mission unfolds, Peter discovers there's far more to Mysterio's story — and to his own life as Spider-Man — than he expected." },
-  { id:"wandavision", title:"WandaVision", date:"2021-01-15", displayDate:"Jan 15, 2021", runtime:"9 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"Grieving the loss of Vision, Wanda Maximoff finds herself living an idyllic, sitcom-inspired life with him in the small town of Westview — a life that shifts strangely from decade to decade. As outside agencies close in and cracks in the illusion widen, the true, heartbreaking nature of the town's reality comes to light." },
-  { id:"falcon-winter-soldier", title:"The Falcon and the Winter Soldier", date:"2021-03-19", displayDate:"March 19, 2021", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"After Captain America passes his shield to a new generation, Sam Wilson and Bucky Barnes are forced to work together — despite their mutual distrust — to stop a militant group called the Flag Smashers. Along the way, they confront their own complicated feelings about who deserves to carry Captain America's legacy." },
-  { id:"loki-s1", title:"Loki (Season 1)", date:"2021-06-09", displayDate:"June 9, 2021", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"An alternate version of Loki, pulled out of time immediately after the events of the first Avengers film, is captured by the Time Variance Authority, a bureaucratic agency that polices the timeline. Forced to help fix a series of dangerous anomalies, he's drawn into a mystery involving another variant of himself and the true nature of the agency he now serves." },
-  { id:"black-widow", title:"Black Widow", date:"2021-07-09", displayDate:"July 9, 2021", runtime:"134 min", runtimeMin:134, phase:"Phase Four", category:"movie",
-    synopsis:"Forced into hiding after breaking with the government, Natasha Romanoff is confronted with a ghost from her past: the family of spies who raised and trained her in a secret program. Reuniting with her “sister” Yelena, she uncovers a wider plot involving the man who once controlled them and the master of the program that made her." },
-  { id:"what-if-s1", title:"What If...? (Season 1)", date:"2021-08-11", displayDate:"Aug 11, 2021", runtime:"9 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"A cosmic being known as the Watcher observes a series of alternate universes where a single decision changes everything — Peggy Carter becomes a super-soldier instead of Steve Rogers, T'Challa becomes Star-Lord, and other pivotal moments unfold in unexpected directions." },
-  { id:"shang-chi", title:"Shang-Chi and the Legend of the Ten Rings", date:"2021-09-03", displayDate:"Sept 3, 2021", runtime:"132 min", runtimeMin:132, phase:"Phase Four", category:"movie",
-    synopsis:"Shang-Chi has spent years building a quiet, ordinary life in San Francisco to escape the shadow of his father, the powerful and immortal leader of a secret organization. When his sister is threatened, Shang-Chi is dragged back into that world and must confront both his father's ambitions and his own family's painful history." },
-  { id:"eternals", title:"Eternals", date:"2021-11-05", displayDate:"Nov 5, 2021", runtime:"157 min", runtimeMin:157, phase:"Phase Four", category:"movie",
-    synopsis:"A group of ancient, immortal beings called the Eternals have lived quietly on Earth for thousands of years, secretly shaping human history from behind the scenes while awaiting the return of their creators. When a long-dormant threat begins to stir, the group is forced to reunite despite old rifts." },
-  { id:"hawkeye", title:"Hawkeye", date:"2021-11-24", displayDate:"Nov 24, 2021", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"Trying to get home for the holidays, retired Avenger Clint Barton instead gets pulled into the orbit of Kate Bishop, a skilled young archer with her own connection to his past as the vigilante Ronin. Together they untangle a criminal conspiracy that forces Clint to reckon with mistakes he'd hoped to leave behind." },
-  { id:"no-way-home", title:"Spider-Man: No Way Home", date:"2021-12-17", displayDate:"Dec 17, 2021", runtime:"148 min", runtimeMin:148, phase:"Phase Four", category:"movie",
-    synopsis:"After his secret identity is exposed to the world, Peter Parker asks Doctor Strange to cast a spell that will make everyone forget he's Spider-Man. When the spell goes wrong, it tears open the multiverse, pulling in villains from other realities who each know a different version of Peter." },
-  { id:"moon-knight", title:"Moon Knight", date:"2022-03-30", displayDate:"March 30, 2022", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"Steven Grant, a mild-mannered museum gift-shop worker, begins experiencing blackouts and memories that aren't his own. He soon discovers he shares his body with Marc Spector, a mercenary bound to the Egyptian moon god Khonshu, and the two must reconcile their fractured identity to stop a fanatical cult leader's apocalyptic plan." },
-  { id:"multiverse-madness", title:"Doctor Strange in the Multiverse of Madness", date:"2022-05-06", displayDate:"May 6, 2022", runtime:"126 min", runtimeMin:126, phase:"Phase Four", category:"movie",
-    synopsis:"A young woman with the rare ability to travel between universes is being hunted by a powerful force desperate to steal that power. Doctor Strange takes her under his protection, journeying through a chaotic multiverse and confronting darker versions of familiar faces along the way — including one shaped by devastating grief." },
-  { id:"ms-marvel", title:"Ms. Marvel", date:"2022-06-08", displayDate:"June 8, 2022", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"Kamala Khan, a Jersey City teenager and devoted fan of the Avengers, gains extraordinary cosmic powers from a mysterious bangle passed down through her family. As she learns to control her new abilities, she also uncovers hidden secrets in her family history that connect her to a forgotten chapter of her heritage." },
-  { id:"love-thunder", title:"Thor: Love and Thunder", date:"2022-07-08", displayDate:"July 8, 2022", runtime:"119 min", runtimeMin:119, phase:"Phase Four", category:"movie",
-    synopsis:"Having lost much in recent years, Thor searches for peace, only to be drawn back into battle when Gorr, a griever turned god-killer, begins hunting deities across the cosmos. Complicating matters, Thor's ex, Jane Foster, has become worthy of his own hammer, forcing Thor to reckon with both an old flame and a new threat." },
-  { id:"she-hulk", title:"She-Hulk: Attorney at Law", date:"2022-08-18", displayDate:"Aug 18, 2022", runtime:"9 Episodes", runtimeMin:null, phase:"Phase Four", category:"series",
-    synopsis:"After an accident exposes lawyer Jennifer Walters to her cousin Bruce Banner's blood, she gains similar powers and transforms into the seven-foot-tall She-Hulk. Balancing a specialized legal practice for superhuman cases with unwanted fame, she navigates a world that suddenly can't stop watching her." },
-  { id:"werewolf-by-night", title:"Werewolf by Night", date:"2022-10-07", displayDate:"Oct 7, 2022", runtime:"53 min", runtimeMin:53, phase:"Phase Four", category:"special",
-    synopsis:"A secretive society of monster hunters gathers for a ritual competition to determine who will inherit a powerful relic after the death of their leader. An outsider among the group forms an uneasy alliance with a monstrous captive as the true nature of the competition — and the “monsters” it targets — is revealed." },
-  { id:"wakanda-forever", title:"Black Panther: Wakanda Forever", date:"2022-11-11", displayDate:"Nov 11, 2022", runtime:"161 min", runtimeMin:161, phase:"Phase Four", category:"movie",
-    synopsis:"Reeling from the sudden death of their king, Wakanda's leaders must protect their nation's secrets and resources as outside powers circle. A newly discovered underwater civilization, led by a formidable ruler with his own claim to Wakanda's precious resources, poses a threat that could push the grieving nation into war." },
-  { id:"gotg-holiday", title:"The Guardians of the Galaxy Holiday Special", date:"2022-11-25", displayDate:"Nov 25, 2022", runtime:"44 min", runtimeMin:44, phase:"Phase Four", category:"special",
-    synopsis:"With their captain sunk into holiday melancholy, two of the Guardians set off on a chaotic mission to Earth to find him the perfect gift, encountering far more trouble than they expected along the way." },
-  { id:"quantumania", title:"Ant-Man and the Wasp: Quantumania", date:"2023-02-17", displayDate:"Feb 17, 2023", runtime:"125 min", runtimeMin:125, phase:"Phase Five", category:"movie",
-    synopsis:"A family outing goes badly wrong when Scott Lang, Hope van Dyne, and their family are pulled deep into the Quantum Realm, a microscopic universe with its own civilizations and rules. There they encounter Kang the Conqueror, an exiled ruler of immense power with designs that stretch far beyond their small corner of the multiverse." },
-  { id:"gotg-3", title:"Guardians of the Galaxy Vol. 3", date:"2023-05-05", displayDate:"May 5, 2023", runtime:"150 min", runtimeMin:150, phase:"Phase Five", category:"movie",
-    synopsis:"When Rocket is gravely injured, the Guardians go on a mission to save him, forcing the team to confront the traumatic origins of his creation at the hands of a ruthless scientist. The journey pushes each member toward their own reckoning, setting up major changes in their future together." },
-  { id:"secret-invasion", title:"Secret Invasion", date:"2023-06-21", displayDate:"June 21, 2023", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"Nick Fury, largely retired from active duty, discovers that a faction of shape-shifting Skrulls has spent years secretly infiltrating positions of power across the globe, planning an invasion from within. Reuniting with old allies, Fury must root out the conspiracy before it's too late." },
-  { id:"loki-s2", title:"Loki (Season 2)", date:"2023-10-05", displayDate:"Oct 5, 2023", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"With the Time Variance Authority in chaos, Loki works urgently to stabilize a timeline fracturing under the weight of countless divergent branches. As new threats emerge from within the agency itself, Loki must decide what kind of person — and god — he wants to become." },
-  { id:"the-marvels", title:"The Marvels", date:"2023-11-10", displayDate:"Nov 10, 2023", runtime:"105 min", runtimeMin:105, phase:"Phase Five", category:"movie",
-    synopsis:"Carol Danvers, now operating largely alone, finds her powers accidentally entangled with those of two other heroes, causing the three to swap places whenever they use their abilities at the same time. The mismatched trio must learn to work together to stop a vengeful Kree revolutionary bent on avenging her home world." },
-  { id:"what-if-s2", title:"What If...? (Season 2)", date:"2023-12-22", displayDate:"Dec 22, 2023", runtime:"9 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"The Watcher returns with a new set of alternate-universe stories, exploring further divergences from key moments across the MCU's history." },
-  { id:"echo", title:"Echo", date:"2024-01-09", displayDate:"Jan 9, 2024", runtime:"5 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"After a violent confrontation with her former mentor, Maya Lopez returns to her hometown and her Choctaw roots to rebuild her life. Confronting the criminal underworld connections she once relied on, she must reckon with her family's history and her own choices." },
-  { id:"deadpool-wolverine", title:"Deadpool & Wolverine", date:"2024-07-26", displayDate:"July 26, 2024", runtime:"128 min", runtimeMin:128, phase:"Phase Five", category:"movie",
-    synopsis:"Mercenary Wade Wilson's quiet, ordinary life is upended when a bureaucratic multiversal agency recruits him for a mission that could save his own fractured timeline — if he can convince a reluctant, embittered version of Wolverine to help. Their bickering partnership pulls them into a chaotic corner of the multiverse." },
-  { id:"agatha", title:"Agatha All Along", date:"2024-09-18", displayDate:"Sept 18, 2024", runtime:"9 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"Stripped of her powers and trapped by a mysterious spell, the witch Agatha Harkness assembles an unlikely coven to walk a dangerous road said to grant any witch who survives it whatever she desires most." },
-  { id:"what-if-s3", title:"What If...? (Season 3)", date:"2024-12-22", displayDate:"Dec 22, 2024", runtime:"7 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"The animated anthology closes out its run with further stories exploring how small shifts in the MCU's history might have led to dramatically different outcomes." },
-  { id:"brave-new-world", title:"Captain America: Brave New World", date:"2025-02-14", displayDate:"Feb 14, 2025", runtime:"118 min", runtimeMin:118, phase:"Phase Five", category:"movie",
-    synopsis:"Having fully taken up the mantle of Captain America, Sam Wilson finds himself at the center of an international incident involving the newly elected U.S. president and a mysterious adversary manipulating events from the shadows. Without the serum that empowered his predecessor, Sam must rely on skill and conviction alone." },
-  { id:"daredevil-s1", title:"Daredevil: Born Again (Season 1)", date:"2025-03-04", displayDate:"March 4, 2025", runtime:"9 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"Matt Murdock has largely set aside his vigilante identity to focus on his legal career, but the return of his old nemesis Wilson Fisk — now maneuvering into political power — pulls him back into New York's criminal underworld." },
-  { id:"thunderbolts", title:"Thunderbolts*", date:"2025-05-02", displayDate:"May 2, 2025", runtime:"127 min", runtimeMin:127, phase:"Phase Five", category:"movie",
-    synopsis:"A group of morally compromised former operatives and antiheroes — each with their own reasons for staying off the grid — are manipulated into working together on a black-ops mission that spirals beyond anyone's control, forcing them to decide whether they're capable of being more than the worst things they've done." },
-  { id:"ironheart", title:"Ironheart", date:"2025-06-24", displayDate:"June 24, 2025", runtime:"6 Episodes", runtimeMin:null, phase:"Phase Five", category:"series",
-    synopsis:"Genius engineering student Riri Williams builds her own suit of high-tech armor from scratch, catching the attention of a mysterious figure who offers her a partnership that comes with serious moral complications." },
-  { id:"fantastic-four", title:"The Fantastic Four: First Steps", date:"2025-07-25", displayDate:"July 25, 2025", runtime:"115 min", runtimeMin:115, phase:"Phase Five", category:"movie",
-    synopsis:"In a retro-futuristic alternate timeline, the newly empowered Fantastic Four settle into life as the world's most famous family of scientist-heroes. Their stability is threatened by the arrival of a cosmic herald warning of Galactus, a planet-devouring entity whose arrival forces the team to weigh the cost of protecting their world." },
-  { id:"wonder-man", title:"Wonder Man", date:"2026-06-01", displayDate:"2026 · TBA", runtime:"8 Episodes", runtimeMin:null, phase:"Phase Six", category:"series", unreleased:true,
-    synopsis:"Aspiring actor and stunt performer Simon Williams navigates the strange, competitive world of Hollywood superhero productions, all while being pulled toward a very real kind of heroism he never expected to embrace." },
-  { id:"visionquest", title:"VisionQuest", date:"2026-07-01", displayDate:"2026 · TBA", runtime:"TBA", runtimeMin:null, phase:"Phase Six", category:"series", unreleased:true,
-    synopsis:"Following the events that fractured his identity, the synthetic being known as Vision sets out to rebuild a sense of self and purpose, confronting questions about what it truly means for him to be alive." },
-  { id:"brand-new-day", title:"Spider-Man: Brand New Day", date:"2026-07-24", displayDate:"2026 · TBA", runtime:"TBA", runtimeMin:null, phase:"Phase Six", category:"movie", unreleased:true,
-    synopsis:"In the aftermath of a reality-altering spell that erased the world's memory of his secret identity, Peter Parker starts over in a New York that no longer recognizes him as Spider-Man, freed from old expectations but stripped of old support systems." },
-  { id:"daredevil-s2", title:"Daredevil: Born Again (Season 2)", date:"2026-09-01", displayDate:"2026 · TBA", runtime:"TBA", runtimeMin:null, phase:"Phase Six", category:"series", unreleased:true,
-    synopsis:"Matt Murdock's fight to reclaim New York from Wilson Fisk's grip continues, with new alliances and enemies complicating his double life." },
-  { id:"doomsday", title:"Avengers: Doomsday", date:"2026-12-18", displayDate:"Dec 18, 2026", runtime:"TBA", runtimeMin:null, phase:"Phase Six", category:"movie", unreleased:true,
-    synopsis:"A sprawling new alliance of heroes — including the Fantastic Four, the people of Wakanda, and other faces old and new — must come together to face Victor von Doom, a brilliant and dangerous adversary whose ambitions threaten to reshape reality itself." },
-  { id:"secret-wars", title:"Avengers: Secret Wars", date:"2027-12-17", displayDate:"Dec 17, 2027", runtime:"TBA", runtimeMin:null, phase:"Phase Six", category:"movie", unreleased:true,
-    synopsis:"Billed as the next chapter after Doomsday, this film is expected to bring together heroes from across a fractured multiverse for a climactic event with stakes spanning multiple realities. Full plot details have not been confirmed." },
+  { id:"iron-man", title:"Iron Man", date:"2008-05-02", displayDate:"May 2, 2008", runtime:"126 min", phase:"Phase One", category:"movie",
+    synopsis:"A billionaire engineer builds a powered suit of armor after a near-fatal ambush, then turns it on the weapons dealers who once armed him." },
+  { id:"incredible-hulk", title:"The Incredible Hulk", date:"2008-06-13", displayDate:"June 13, 2008", runtime:"112 min", phase:"Phase One", category:"movie",
+    synopsis:"A fugitive scientist searches for a cure to the rage that transforms him into the Hulk while the military closes in." },
+  { id:"iron-man-2", title:"Iron Man 2", date:"2010-05-07", displayDate:"May 7, 2010", runtime:"124 min", phase:"Phase One", category:"movie",
+    synopsis:"Facing government pressure over his armor technology, Tony Stark battles a vengeful physicist and the slow poisoning of his own reactor." },
+  { id:"thor", title:"Thor", date:"2011-05-06", displayDate:"May 6, 2011", runtime:"115 min", phase:"Phase One", category:"movie",
+    synopsis:"Banished to Earth for his recklessness, an Asgardian prince must earn back his hammer and stop his brother's plot to seize the throne." },
+  { id:"cap-first-avenger", title:"Captain America: The First Avenger", date:"2011-07-22", displayDate:"July 22, 2011", runtime:"124 min", phase:"Phase One", category:"movie",
+    synopsis:"A scrawny recruit becomes a super-soldier and fights a Nazi-splinter organization during World War II." },
+  { id:"avengers", title:"The Avengers", date:"2012-05-04", displayDate:"May 4, 2012", runtime:"143 min", phase:"Phase One", category:"movie",
+    synopsis:"A team of extraordinary individuals is assembled to stop an adopted Asgardian god and an alien army from conquering Earth." },
+  { id:"iron-man-3", title:"Iron Man 3", date:"2013-05-03", displayDate:"May 3, 2013", runtime:"130 min", phase:"Phase Two", category:"movie",
+    synopsis:"Still shaken after battling an alien invasion, Tony Stark faces a terrorist mastermind while his personal life unravels." },
+  { id:"thor-dark-world", title:"Thor: The Dark World", date:"2013-11-08", displayDate:"Nov 8, 2013", runtime:"112 min", phase:"Phase Two", category:"movie",
+    synopsis:"Thor reluctantly teams up with his imprisoned brother to stop an ancient enemy from plunging the universe into darkness." },
+  { id:"cap-winter-soldier", title:"Captain America: The Winter Soldier", date:"2014-04-04", displayDate:"April 4, 2014", runtime:"136 min", phase:"Phase Two", category:"movie",
+    synopsis:"A super-soldier uncovers a conspiracy inside the intelligence agency he serves and faces a deadly assassin from his past." },
+  { id:"gotg-1", title:"Guardians of the Galaxy", date:"2014-08-01", displayDate:"Aug 1, 2014", runtime:"121 min", phase:"Phase Two", category:"movie",
+    synopsis:"A band of misfit outlaws bands together to stop a fanatic from destroying a planet with a powerful orb." },
+  { id:"avengers-aou", title:"Avengers: Age of Ultron", date:"2015-05-01", displayDate:"May 1, 2015", runtime:"141 min", phase:"Phase Two", category:"movie",
+    synopsis:"A peacekeeping artificial intelligence turns against humanity, forcing a team of heroes to confront a threat of their own making." },
+  { id:"ant-man", title:"Ant-Man", date:"2015-07-17", displayDate:"July 17, 2015", runtime:"117 min", phase:"Phase Two", category:"movie",
+    synopsis:"A small-time thief dons a size-shifting suit to help its creator pull off a heist that could protect the world." },
+  { id:"cap-civil-war", title:"Captain America: Civil War", date:"2016-05-06", displayDate:"May 6, 2016", runtime:"147 min", phase:"Phase Three", category:"movie",
+    synopsis:"A government effort to regulate enhanced individuals splits a team of heroes into two opposing factions." },
+  { id:"agent-carter-s1", title:"Agent Carter", date:"2015-01-06", displayDate:"Jan 6, 2015", runtime:"8 Episodes", phase:"Phase Two", category:"series",
+    synopsis:"Working in the shadows of a male-dominated agency, Peggy Carter clears a friend's name while balancing double lives." },
+  { id:"doctor-strange", title:"Doctor Strange", date:"2016-11-04", displayDate:"Nov 4, 2016", runtime:"115 min", phase:"Phase Three", category:"movie",
+    synopsis:"After a car accident ends his surgical career, a brilliant surgeon learns the mystic arts and confronts threats beyond the physical world." },
+  { id:"gotg-2", title:"Guardians of the Galaxy Vol. 2", date:"2017-05-05", displayDate:"May 5, 2017", runtime:"136 min", phase:"Phase Three", category:"movie",
+    synopsis:"A team of cosmic misfits faces family secrets as their leader reunites with his mysterious father." },
+  { id:"spiderman-homecoming", title:"Spider-Man: Homecoming", date:"2017-07-07", displayDate:"July 7, 2017", runtime:"133 min", phase:"Phase Three", category:"movie",
+    synopsis:"A teenage hero balances high school with his new responsibilities, taking on an arms dealer selling alien weaponry." },
+  { id:"thor-ragnarok", title:"Thor: Ragnarok", date:"2017-11-03", displayDate:"Nov 3, 2017", runtime:"130 min", phase:"Phase Three", category:"movie",
+    synopsis:"Stripped of his powers and hammer, Thor must escape a cosmic prison to stop his sister from destroying his home world." },
+  { id:"black-panther", title:"Black Panther", date:"2018-02-16", displayDate:"Feb 16, 2018", runtime:"134 min", phase:"Phase Three", category:"movie",
+    synopsis:"A new king returns home to claim the throne, but a rival with ties to his family's past threatens to tear the nation apart." },
+  { id:"infinity-war", title:"Avengers: Infinity War", date:"2018-04-27", displayDate:"April 27, 2018", runtime:"149 min", phase:"Phase Three", category:"movie",
+    synopsis:"Earth's mightiest heroes race across the galaxy to stop a powerful warlord from collecting six ancient stones and erasing half of all life." },
+  { id:"ant-man-wasp", title:"Ant-Man and the Wasp", date:"2018-07-06", displayDate:"July 6, 2018", runtime:"118 min", phase:"Phase Three", category:"movie",
+    synopsis:"A reluctant hero teams up with his partner's daughter to rescue her mother from a dimension of subatomic space." },
+  { id:"captain-marvel", title:"Captain Marvel", date:"2019-03-08", displayDate:"March 8, 2019", runtime:"124 min", phase:"Phase Three", category:"movie",
+    synopsis:"An Air Force pilot discovers her cosmic powers and uncovers a hidden past amid a war between two alien races." },
+  { id:"endgame", title:"Avengers: Endgame", date:"2019-04-26", displayDate:"April 26, 2019", runtime:"181 min", phase:"Phase Three", category:"movie",
+    synopsis:"The surviving heroes attempt a desperate plan to undo a catastrophic loss and reverse the disappearance of half the universe." },
+  { id:"far-from-home", title:"Spider-Man: Far From Home", date:"2019-07-02", displayDate:"July 2, 2019", runtime:"129 min", phase:"Phase Three", category:"movie",
+    synopsis:"A school trip across Europe turns into a mission when a mysterious new hero reveals a threat tied to the elements." },
+  { id:"wandavision", title:"WandaVision", date:"2021-01-15", displayDate:"Jan 15, 2021", runtime:"9 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A grieving hero and her synthetic partner live an idyllic, sitcom-style life until cracks in the illusion reveal a deeper mystery." },
+  { id:"falcon-winter-soldier", title:"The Falcon and the Winter Soldier", date:"2021-03-19", displayDate:"March 19, 2021", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"Two former allies team up to stop a militant group and confront the legacy of a shield passed down between them." },
+  { id:"loki-s1", title:"Loki (Season 1)", date:"2021-06-09", displayDate:"June 9, 2021", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"An alternate version of a trickster god is captured by a bureaucratic time agency and forced to help fix fractures in the timeline." },
+  { id:"black-widow", title:"Black Widow", date:"2021-07-09", displayDate:"July 9, 2021", runtime:"134 min", phase:"Phase Four", category:"movie",
+    synopsis:"A former spy confronts her past and reunites with the estranged operatives she once called family." },
+  { id:"what-if-s1", title:"What If...? (Season 1)", date:"2021-08-11", displayDate:"Aug 11, 2021", runtime:"9 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A cosmic observer explores alternate timelines where pivotal moments unfold in unexpected ways." },
+  { id:"shang-chi", title:"Shang-Chi and the Legend of the Ten Rings", date:"2021-09-03", displayDate:"Sept 3, 2021", runtime:"132 min", phase:"Phase Four", category:"movie",
+    synopsis:"A skilled martial artist is pulled back into the secret organization his father leads after years of hiding away." },
+  { id:"eternals", title:"Eternals", date:"2021-11-05", displayDate:"Nov 5, 2021", runtime:"157 min", phase:"Phase Four", category:"movie",
+    synopsis:"A group of ancient immortals who secretly shaped human history reunite to face a threat tied to their true purpose." },
+  { id:"hawkeye", title:"Hawkeye", date:"2021-11-24", displayDate:"Nov 24, 2021", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A veteran archer trains a determined newcomer while being pursued by figures from his past." },
+  { id:"no-way-home", title:"Spider-Man: No Way Home", date:"2021-12-17", displayDate:"Dec 17, 2021", runtime:"148 min", phase:"Phase Four", category:"movie",
+    synopsis:"When a spell to conceal his identity goes wrong, a young hero faces villains pulled in from other universes." },
+  { id:"moon-knight", title:"Moon Knight", date:"2022-03-30", displayDate:"March 30, 2022", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A mild-mannered gift-shop worker discovers he shares a body with a mercenary and becomes entangled with an ancient god." },
+  { id:"multiverse-madness", title:"Doctor Strange in the Multiverse of Madness", date:"2022-05-06", displayDate:"May 6, 2022", runtime:"126 min", phase:"Phase Four", category:"movie",
+    synopsis:"A sorcerer journeys across the multiverse to protect a young woman with reality-warping powers from a relentless pursuer." },
+  { id:"ms-marvel", title:"Ms. Marvel", date:"2022-06-08", displayDate:"June 8, 2022", runtime:"6 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A teenager gains extraordinary powers and idolizes the heroes she grew up admiring while uncovering her family's hidden history." },
+  { id:"love-thunder", title:"Thor: Love and Thunder", date:"2022-07-08", displayDate:"July 8, 2022", runtime:"119 min", phase:"Phase Four", category:"movie",
+    synopsis:"Seeking inner peace, Thor is drawn back into battle when a vengeful figure begins hunting gods across the universe." },
+  { id:"she-hulk", title:"She-Hulk: Attorney at Law", date:"2022-08-18", displayDate:"Aug 18, 2022", runtime:"9 Episodes", phase:"Phase Four", category:"series",
+    synopsis:"A lawyer inherits her cousin's powers and navigates work, relationships, and sudden fame as a green-skinned hero." },
+  { id:"werewolf-by-night", title:"Werewolf by Night", date:"2022-10-07", displayDate:"Oct 7, 2022", runtime:"53 min", phase:"Phase Four", category:"special",
+    synopsis:"A secret society of monster hunters competes in a deadly ritual contest to inherit a powerful relic." },
+  { id:"wakanda-forever", title:"Black Panther: Wakanda Forever", date:"2022-11-11", displayDate:"Nov 11, 2022", runtime:"161 min", phase:"Phase Four", category:"movie",
+    synopsis:"Following their king's death, a nation's leaders must protect their home from a new underwater kingdom while grieving his loss." },
+  { id:"gotg-holiday", title:"The Guardians of the Galaxy Holiday Special", date:"2022-11-25", displayDate:"Nov 25, 2022", runtime:"44 min", phase:"Phase Four", category:"special",
+    synopsis:"Two cosmic misfits travel to Earth to find the perfect holiday gift for their grieving captain." },
+  { id:"quantumania", title:"Ant-Man and the Wasp: Quantumania", date:"2023-02-17", displayDate:"Feb 17, 2023", runtime:"125 min", phase:"Phase Five", category:"movie",
+    synopsis:"A family is pulled into a hidden microscopic realm and comes face to face with a powerful conqueror." },
+  { id:"gotg-3", title:"Guardians of the Galaxy Vol. 3", date:"2023-05-05", displayDate:"May 5, 2023", runtime:"150 min", phase:"Phase Five", category:"movie",
+    synopsis:"A team of cosmic misfits risks everything on a mission to save one of their own, uncovering dark origins along the way." },
+  { id:"secret-invasion", title:"Secret Invasion", date:"2023-06-21", displayDate:"June 21, 2023", runtime:"6 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A veteran spymaster uncovers a decades-long infiltration by shape-shifting infiltrators posing as world leaders." },
+  { id:"loki-s2", title:"Loki (Season 2)", date:"2023-10-05", displayDate:"Oct 5, 2023", runtime:"6 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A reformed trickster works to save a fracturing time agency as branching timelines threaten to collapse the multiverse." },
+  { id:"the-marvels", title:"The Marvels", date:"2023-11-10", displayDate:"Nov 10, 2023", runtime:"105 min", phase:"Phase Five", category:"movie",
+    synopsis:"Three heroes with entangled powers must team up after an unstable wormhole forces them to swap places unpredictably." },
+  { id:"what-if-s2", title:"What If...? (Season 2)", date:"2023-12-22", displayDate:"Dec 22, 2023", runtime:"9 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A cosmic observer returns with new alternate-reality stories spinning further off familiar turning points." },
+  { id:"echo", title:"Echo", date:"2024-01-09", displayDate:"Jan 9, 2024", runtime:"5 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A skilled fighter returns to her hometown roots while confronting the criminal underworld connections she left behind." },
+  { id:"deadpool-wolverine", title:"Deadpool & Wolverine", date:"2024-07-26", displayDate:"July 26, 2024", runtime:"128 min", phase:"Phase Five", category:"movie",
+    synopsis:"A wisecracking mercenary recruits a reluctant, clawed loner for a multiversal mission that threatens to unravel his own timeline." },
+  { id:"agatha", title:"Agatha All Along", date:"2024-09-18", displayDate:"Sept 18, 2024", runtime:"9 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A cunning witch assembles an unlikely coven and walks a mysterious road in hopes of reclaiming her lost power." },
+  { id:"what-if-s3", title:"What If...? (Season 3)", date:"2024-12-22", displayDate:"Dec 22, 2024", runtime:"7 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"More alternate-timeline stories close out the animated anthology series." },
+  { id:"brave-new-world", title:"Captain America: Brave New World", date:"2025-02-14", displayDate:"Feb 14, 2025", runtime:"118 min", phase:"Phase Five", category:"movie",
+    synopsis:"A new shield-bearer fully steps into his role and confronts a political conspiracy tied to a dangerous new adversary." },
+  { id:"daredevil-s1", title:"Daredevil: Born Again (Season 1)", date:"2025-03-04", displayDate:"March 4, 2025", runtime:"9 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A lawyer by day and vigilante by night balances both lives as a ruthless figure reclaims power over the city." },
+  { id:"thunderbolts", title:"Thunderbolts*", date:"2025-05-02", displayDate:"May 2, 2025", runtime:"127 min", phase:"Phase Five", category:"movie",
+    synopsis:"A group of morally gray former operatives is thrown together on a black-ops mission and forced to function as a team." },
+  { id:"ironheart", title:"Ironheart", date:"2025-06-24", displayDate:"June 24, 2025", runtime:"6 Episodes", phase:"Phase Five", category:"series",
+    synopsis:"A genius young inventor builds her own suit of armor and is pulled into a dangerous partnership that tests her morals." },
+  { id:"fantastic-four", title:"The Fantastic Four: First Steps", date:"2025-07-25", displayDate:"July 25, 2025", runtime:"115 min", phase:"Phase Five", category:"movie",
+    synopsis:"A family of explorers-turned-heroes faces a world-devouring cosmic threat in a retro-futuristic alternate timeline." },
+  { id:"wonder-man", title:"Wonder Man", date:"2026-06-01", displayDate:"2026 · TBA", runtime:"8 Episodes", phase:"Phase Six", category:"series", unreleased:true,
+    synopsis:"An aspiring actor gets pulled into the world of stunt work and superheroics he never asked for." },
+  { id:"visionquest", title:"VisionQuest", date:"2026-07-01", displayDate:"2026 · TBA", runtime:"TBA", phase:"Phase Six", category:"series", unreleased:true,
+    synopsis:"A synthetic being searches for a new identity and purpose after the events that reshaped his existence." },
+  { id:"brand-new-day", title:"Spider-Man: Brand New Day", date:"2026-07-24", displayDate:"2026 · TBA", runtime:"TBA", phase:"Phase Six", category:"movie", unreleased:true,
+    synopsis:"A young hero starts over in the aftermath of a reality-altering spell, navigating a world that no longer remembers him." },
+  { id:"daredevil-s2", title:"Daredevil: Born Again (Season 2)", date:"2026-09-01", displayDate:"2026 · TBA", runtime:"TBA", phase:"Phase Six", category:"series", unreleased:true,
+    synopsis:"The fight for the soul of the city continues into a new chapter." },
+  { id:"doomsday", title:"Avengers: Doomsday", date:"2026-12-18", displayDate:"Dec 18, 2026", runtime:"TBA", phase:"Phase Six", category:"movie", unreleased:true,
+    synopsis:"A wide alliance of heroes joins forces to face a brilliant, armored adversary with designs on reshaping reality itself." },
+  { id:"secret-wars", title:"Avengers: Secret Wars", date:"2027-12-17", displayDate:"Dec 17, 2027", runtime:"TBA", phase:"Phase Six", category:"movie", unreleased:true,
+    synopsis:"The next chapter brings together heroes from across the multiverse for what's billed as the saga's next major turning point." },
 ];
 
 const PHASE_ORDER = ["Phase One","Phase Two","Phase Three","Phase Four","Phase Five","Phase Six"];
 const STORAGE_KEY = "mcu-archive-watched";
-const THEME_MODE_KEY = "mcu-archive-theme";
-const THEME_ACCENT_KEY = "mcu-archive-accent";
+const THEME_KEY = "mcu-archive-theme";
 
 let watched = new Set();
+let expanded = new Set();
 let state = { search:"", phase:"all", category:"all", sort:"asc" };
-let activeSuggestionIndex = -1;
 
 /* =====================================================================
    UTILITIES
    ===================================================================== */
-function debounce(fn, delay){
-  let timer;
-  return function(...args){
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
-  };
-}
-
-function escapeHtml(str){
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function hashString(str){
-  let hash = 0;
-  for(let i=0;i<str.length;i++){
-    hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-  }
-  return hash;
-}
-
-function getGradientClass(id){
-  return "grad-" + (hashString(id) % 8);
-}
-
-const STOP_WORDS = new Set(["the","of","and","a","an","in","to","on","for","&","season","1","2","3"]);
-function getMonogram(title){
-  const clean = title.replace(/[:*().]/g, "").replace(/\d+/g, "");
-  const words = clean.split(/\s+/).filter(w => w && !STOP_WORDS.has(w.toLowerCase()));
-  const source = words.length ? words : clean.split(/\s+/).filter(Boolean);
-  const letters = source.slice(0, 2).map(w => w[0].toUpperCase()).join("");
-  return letters || "MC";
-}
-
 function categoryLabel(cat){
   switch(cat){
     case "movie": return "Movie";
@@ -1328,38 +1021,6 @@ function categoryLabel(cat){
     case "special": return "Special";
     default: return cat;
   }
-}
-
-function highlightMatch(text, query){
-  if(!query) return escapeHtml(text);
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if(idx === -1) return escapeHtml(text);
-  const before = escapeHtml(text.slice(0, idx));
-  const match = escapeHtml(text.slice(idx, idx + query.length));
-  const after = escapeHtml(text.slice(idx + query.length));
-  return `${before}<mark>${match}</mark>${after}`;
-}
-
-function trailerSearchUrl(title){
-  const q = encodeURIComponent(title + " official trailer");
-  return `https://www.youtube.com/results?search_query=${q}`;
-}
-
-function animateCounter(el, target, duration = 900){
-  const start = Number(el.dataset.count || 0);
-  const startTime = performance.now();
-  function step(now){
-    const progress = Math.min((now - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const value = Math.round(start + (target - start) * eased);
-    el.textContent = value;
-    if(progress < 1){
-      requestAnimationFrame(step);
-    }else{
-      el.dataset.count = target;
-    }
-  }
-  requestAnimationFrame(step);
 }
 
 /* =====================================================================
@@ -1373,104 +1034,92 @@ function loadWatched(){
     watched = new Set();
   }
 }
+
 function saveWatched(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...watched]));
 }
+
 function toggleWatched(id){
   if(watched.has(id)) watched.delete(id);
   else watched.add(id);
   saveWatched();
   updateDashboard();
   renderTimeline();
-  if(currentModalId === id) syncModalWatchState();
+}
+
+function toggleExpanded(id, cardEl){
+  const title = TITLES.find(t => t.id === id)?.title || "";
+  if(expanded.has(id)){
+    expanded.delete(id);
+    cardEl.classList.remove("is-expanded");
+    cardEl.setAttribute("aria-expanded", "false");
+    cardEl.setAttribute("aria-label", `${title}, collapsed. Press Enter for synopsis.`);
+  }else{
+    expanded.add(id);
+    cardEl.classList.add("is-expanded");
+    cardEl.setAttribute("aria-expanded", "true");
+    cardEl.setAttribute("aria-label", `${title}, expanded. Press Enter to collapse.`);
+  }
 }
 
 /* =====================================================================
-   CARD BUILDING (flip card: front poster panel / back detail panel)
+   RENDERING — CARD
    ===================================================================== */
 function buildCard(item, indexNumber){
   const isWatched = watched.has(item.id);
-  const gradClass = getGradientClass(item.id);
-  const monogram = getMonogram(item.title);
-  const trailerHref = trailerSearchUrl(item.title);
+  const isExpanded = expanded.has(item.id);
 
   const card = document.createElement("article");
-  card.className = "card" + (isWatched ? " is-watched" : "");
-  card.dataset.id = item.id;
+  card.className = "card" + (isWatched ? " is-watched" : "") + (isExpanded ? " is-expanded" : "");
+  card.setAttribute("aria-expanded", String(isExpanded));
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-label", `${item.title}, ${isExpanded ? "expanded" : "collapsed"}. Press Enter for synopsis.`);
 
   card.innerHTML = `
-    <div class="card-inner">
-      <div class="card-face card-front">
-        <div class="card-poster ${gradClass}">
-          <span class="card-index-badge">${indexNumber}</span>
-          <span class="poster-monogram">${monogram}</span>
-          <button class="card-expand-btn" data-action="expand" aria-label="View full details">
-            <svg viewBox="0 0 24 24" fill="none"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
-        <div class="card-front-info">
-          <h3 class="card-title">${escapeHtml(item.title)}</h3>
-          <div class="card-info-row">
-            <span>${item.displayDate}</span>
-            <span>${categoryLabel(item.category)}</span>
-            ${item.unreleased ? '<span class="unreleased-tag">Unreleased</span>' : ''}
-          </div>
-          <span class="flip-hint">Hover to preview · click for details</span>
+    <div class="card-row">
+      <span class="card-index">${indexNumber}</span>
+      <div class="card-main">
+        <h3 class="card-title">${item.title}</h3>
+        <div class="card-info-row">
+          <span>${item.displayDate}</span>
+          <span>${categoryLabel(item.category)}</span>
+          ${item.unreleased ? '<span class="unreleased-tag">Unreleased</span>' : ''}
         </div>
       </div>
-      <div class="card-face card-back">
-        <div class="card-back-top">
-          <span class="card-back-title">${escapeHtml(item.title)}</span>
-          <p class="card-back-synopsis">${escapeHtml(item.synopsis)}</p>
-        </div>
-        <div class="card-back-footer">
-          <a class="btn btn-primary btn-trailer" href="${trailerHref}" target="_blank" rel="noopener noreferrer" data-ripple>
-            <svg viewBox="0 0 24 24" fill="none"><polygon points="6 4 20 12 6 20" fill="currentColor"/></svg>
-            Trailer
-          </a>
-          <button class="watch-btn ${isWatched ? "watched" : ""}" data-action="watch" data-id="${item.id}">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>${isWatched ? "Watched" : "Mark Watched"}</span>
-          </button>
-        </div>
-      </div>
+      <span class="card-chevron" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <button class="watch-btn ${isWatched ? "watched" : ""}" data-id="${item.id}" aria-label="${isWatched ? "Mark " + item.title + " as not watched" : "Mark " + item.title + " as watched"}">
+        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>${isWatched ? "Watched" : "Mark as Watched"}</span>
+      </button>
+    </div>
+    <div class="card-desc-wrap">
+      <p class="card-desc">${item.synopsis}</p>
     </div>
   `;
 
-  card.querySelector('[data-action="watch"]').addEventListener("click", (e) => {
+  card.querySelector(".watch-btn").addEventListener("click", (e) => {
     e.stopPropagation();
     toggleWatched(item.id);
   });
-  card.querySelector('[data-action="expand"]').addEventListener("click", (e) => {
-    e.stopPropagation();
-    openModal(item.id);
-  });
-  card.querySelectorAll("[data-ripple]").forEach(el => {
-    el.addEventListener("click", (e) => spawnRipple(e, el));
-  });
-  card.addEventListener("click", (e) => {
-    // Tap-to-flip on touch devices (hover handles desktop).
-    if(window.matchMedia("(hover: hover)").matches) return;
-    card.classList.toggle("is-flipped");
+
+  card.addEventListener("click", () => toggleExpanded(item.id, card));
+
+  card.addEventListener("keydown", (e) => {
+    if(e.target.closest(".watch-btn")) return; // let the button handle its own activation
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      toggleExpanded(item.id, card);
+    }
   });
 
   return card;
 }
 
-function spawnRipple(e, el){
-  const rect = el.getBoundingClientRect();
-  const ripple = document.createElement("span");
-  const size = Math.max(rect.width, rect.height);
-  ripple.className = "ripple";
-  ripple.style.width = ripple.style.height = size + "px";
-  ripple.style.left = (e.clientX - rect.left - size / 2) + "px";
-  ripple.style.top = (e.clientY - rect.top - size / 2) + "px";
-  el.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 600);
-}
-
 /* =====================================================================
-   TIMELINE RENDER
+   RENDERING — TIMELINE (grouped by phase, filtered/sorted)
    ===================================================================== */
 function getFilteredTitles(){
   let list = TITLES.filter(item => {
@@ -1479,7 +1128,12 @@ function getFilteredTitles(){
     const matchesCategory = state.category === "all" || item.category === state.category;
     return matchesSearch && matchesPhase && matchesCategory;
   });
-  list.sort((a,b) => state.sort === "asc" ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date));
+
+  list.sort((a,b) => state.sort === "asc"
+    ? a.date.localeCompare(b.date)
+    : b.date.localeCompare(a.date)
+  );
+
   return list;
 }
 
@@ -1498,6 +1152,7 @@ function renderTimeline(){
   }
   emptyState.hidden = true;
 
+  // Group by phase, preserving sort order within each group.
   const grouped = {};
   filtered.forEach(item => {
     if(!grouped[item.phase]) grouped[item.phase] = [];
@@ -1533,53 +1188,23 @@ function renderTimeline(){
 }
 
 /* =====================================================================
-   DASHBOARD (extended stats + animated counters)
+   DASHBOARD
    ===================================================================== */
-function formatRuntime(totalMin){
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return `${h}h ${m}m`;
-}
-
 function updateDashboard(){
   const total = TITLES.length;
-  const watchedItems = TITLES.filter(t => watched.has(t.id));
-  const watchedCount = watchedItems.length;
+  const watchedCount = watched.size;
   const remaining = total - watchedCount;
   const percent = total ? Math.round((watchedCount / total) * 100) : 0;
 
-  const movies = TITLES.filter(t => t.category === "movie").length;
-  const series = TITLES.filter(t => t.category === "series").length;
-
-  const totalRuntimeMin = TITLES.reduce((sum, t) => sum + (t.runtimeMin || 0), 0);
-
-  const phaseCounts = {};
-  watchedItems.forEach(t => { phaseCounts[t.phase] = (phaseCounts[t.phase] || 0) + 1; });
-  let favPhase = "—";
-  let favCount = 0;
-  Object.entries(phaseCounts).forEach(([phase, count]) => {
-    if(count > favCount){ favCount = count; favPhase = phase; }
-  });
-
-  animateCounter(document.getElementById("statTotal"), total);
-  animateCounter(document.getElementById("statWatched"), watchedCount);
-  animateCounter(document.getElementById("statRemaining"), remaining);
-  animateCounter(document.getElementById("statMovies"), movies);
-  animateCounter(document.getElementById("statSeries"), series);
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statWatched").textContent = watchedCount;
+  document.getElementById("statRemaining").textContent = remaining;
   document.getElementById("statPercent").textContent = percent + "%";
-  document.getElementById("statRuntime").textContent = formatRuntime(totalRuntimeMin);
-  document.getElementById("statFavPhase").textContent = favPhase === "—" ? "—" : favPhase.replace("Phase ", "P");
   document.getElementById("progressBarFill").style.width = percent + "%";
-
-  const nextUnwatched = TITLES
-    .filter(t => !watched.has(t.id))
-    .sort((a,b) => a.date.localeCompare(b.date))[0];
-  const nextUpTitle = document.getElementById("nextUpTitle");
-  nextUpTitle.textContent = nextUnwatched ? nextUnwatched.title : "You're all caught up";
 }
 
 /* =====================================================================
-   FILTERS
+   FILTERS INIT
    ===================================================================== */
 function populatePhaseFilter(){
   const select = document.getElementById("phaseFilter");
@@ -1599,28 +1224,32 @@ function initFilters(){
   const sortFilter = document.getElementById("sortFilter");
   const resetBtn = document.getElementById("resetFilters");
 
-  const debouncedRender = debounce(() => renderTimeline(), 250);
-
   searchInput.addEventListener("input", (e) => {
     state.search = e.target.value;
     navSearchInput.value = e.target.value;
-    renderAutocomplete(e.target.value);
-    debouncedRender();
-  });
-  searchInput.addEventListener("keydown", handleAutocompleteKeydown);
-  searchInput.addEventListener("blur", () => {
-    setTimeout(() => closeAutocomplete(), 120);
+    renderTimeline();
   });
 
   navSearchInput.addEventListener("input", (e) => {
     state.search = e.target.value;
     searchInput.value = e.target.value;
-    debouncedRender();
+    renderTimeline();
   });
 
-  phaseFilter.addEventListener("change", (e) => { state.phase = e.target.value; renderTimeline(); });
-  categoryFilter.addEventListener("change", (e) => { state.category = e.target.value; renderTimeline(); });
-  sortFilter.addEventListener("change", (e) => { state.sort = e.target.value; renderTimeline(); });
+  phaseFilter.addEventListener("change", (e) => {
+    state.phase = e.target.value;
+    renderTimeline();
+  });
+
+  categoryFilter.addEventListener("change", (e) => {
+    state.category = e.target.value;
+    renderTimeline();
+  });
+
+  sortFilter.addEventListener("change", (e) => {
+    state.sort = e.target.value;
+    renderTimeline();
+  });
 
   resetBtn.addEventListener("click", () => {
     state = { search:"", phase:"all", category:"all", sort:"asc" };
@@ -1629,220 +1258,12 @@ function initFilters(){
     phaseFilter.value = "all";
     categoryFilter.value = "all";
     sortFilter.value = "asc";
-    closeAutocomplete();
     renderTimeline();
   });
 }
 
 /* =====================================================================
-   AUTOCOMPLETE
-   ===================================================================== */
-function renderAutocomplete(query){
-  const dropdown = document.getElementById("autocompleteDropdown");
-  const input = document.getElementById("searchInput");
-  activeSuggestionIndex = -1;
-
-  if(!query){
-    closeAutocomplete();
-    return;
-  }
-
-  const matches = TITLES.filter(t => t.title.toLowerCase().includes(query.toLowerCase())).slice(0, 8);
-
-  if(matches.length === 0){
-    dropdown.innerHTML = `<div class="autocomplete-empty">No matches for "${escapeHtml(query)}"</div>`;
-  }else{
-    dropdown.innerHTML = matches.map((t, i) => `
-      <div class="autocomplete-item" data-id="${t.id}" data-index="${i}">
-        <span>${highlightMatch(t.title, query)}</span>
-        <span class="autocomplete-item-year">${t.date.slice(0,4)}</span>
-      </div>
-    `).join("");
-  }
-
-  dropdown.classList.add("open");
-  input.setAttribute("aria-expanded", "true");
-
-  dropdown.querySelectorAll(".autocomplete-item").forEach(el => {
-    el.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      selectAutocompleteItem(el.dataset.id);
-    });
-  });
-}
-
-function selectAutocompleteItem(id){
-  const item = TITLES.find(t => t.id === id);
-  if(!item) return;
-  const searchInput = document.getElementById("searchInput");
-  searchInput.value = item.title;
-  state.search = item.title;
-  document.getElementById("navSearchInput").value = item.title;
-  closeAutocomplete();
-  renderTimeline();
-  setTimeout(() => openModal(id), 150);
-}
-
-function closeAutocomplete(){
-  const dropdown = document.getElementById("autocompleteDropdown");
-  dropdown.classList.remove("open");
-  document.getElementById("searchInput").setAttribute("aria-expanded", "false");
-  activeSuggestionIndex = -1;
-}
-
-function handleAutocompleteKeydown(e){
-  const dropdown = document.getElementById("autocompleteDropdown");
-  const items = [...dropdown.querySelectorAll(".autocomplete-item")];
-  if(!items.length || !dropdown.classList.contains("open")) return;
-
-  if(e.key === "ArrowDown"){
-    e.preventDefault();
-    activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, items.length - 1);
-    updateActiveSuggestion(items);
-  }else if(e.key === "ArrowUp"){
-    e.preventDefault();
-    activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
-    updateActiveSuggestion(items);
-  }else if(e.key === "Enter"){
-    if(activeSuggestionIndex >= 0 && items[activeSuggestionIndex]){
-      e.preventDefault();
-      selectAutocompleteItem(items[activeSuggestionIndex].dataset.id);
-    }
-  }else if(e.key === "Escape"){
-    closeAutocomplete();
-  }
-}
-
-function updateActiveSuggestion(items){
-  items.forEach((el, i) => el.classList.toggle("active", i === activeSuggestionIndex));
-  const active = items[activeSuggestionIndex];
-  if(active) active.scrollIntoView({ block:"nearest" });
-}
-
-/* =====================================================================
-   MODAL
-   ===================================================================== */
-let currentModalId = null;
-
-function openModal(id){
-  const item = TITLES.find(t => t.id === id);
-  if(!item) return;
-  currentModalId = id;
-
-  const backdrop = document.getElementById("modalBackdrop");
-  const poster = document.getElementById("modalPoster");
-  poster.className = "modal-poster " + getGradientClass(item.id);
-  poster.innerHTML = `<span class="poster-monogram">${getMonogram(item.title)}</span>`;
-
-  document.getElementById("modalPhase").textContent = item.phase;
-  document.getElementById("modalTitle").textContent = item.title;
-  document.getElementById("modalMeta").innerHTML = `
-    <span>${item.displayDate}</span>
-    <span>${item.runtime}</span>
-    <span>${categoryLabel(item.category)}</span>
-    ${item.unreleased ? '<span class="unreleased-tag">Unreleased</span>' : ''}
-  `;
-  document.getElementById("modalRatings").innerHTML = `
-    <div class="modal-rating-item"><span class="modal-rating-label">IMDb</span><span class="modal-rating-value">—</span></div>
-    <div class="modal-rating-item"><span class="modal-rating-label">Rotten Tomatoes</span><span class="modal-rating-value">—</span></div>
-    <div class="modal-rating-item"><span class="modal-rating-label">Metacritic</span><span class="modal-rating-value">—</span></div>
-  `;
-  document.getElementById("modalSynopsis").textContent = item.synopsis;
-
-  const trailerLink = document.getElementById("modalTrailer");
-  trailerLink.href = trailerSearchUrl(item.title);
-
-  syncModalWatchState();
-
-  backdrop.classList.add("open");
-  document.body.style.overflow = "hidden";
-}
-
-function syncModalWatchState(){
-  if(!currentModalId) return;
-  const isWatched = watched.has(currentModalId);
-  const btn = document.getElementById("modalWatchBtn");
-  btn.classList.toggle("watched", isWatched);
-  btn.querySelector("span").textContent = isWatched ? "Watched" : "Mark as Watched";
-}
-
-function closeModal(){
-  document.getElementById("modalBackdrop").classList.remove("open");
-  document.body.style.overflow = "";
-  currentModalId = null;
-}
-
-function initModal(){
-  document.getElementById("modalClose").addEventListener("click", closeModal);
-  document.getElementById("modalBackdrop").addEventListener("click", (e) => {
-    if(e.target.id === "modalBackdrop") closeModal();
-  });
-  document.getElementById("modalWatchBtn").addEventListener("click", () => {
-    if(currentModalId) toggleWatched(currentModalId);
-  });
-  document.addEventListener("keydown", (e) => {
-    if(e.key === "Escape" && document.getElementById("modalBackdrop").classList.contains("open")){
-      closeModal();
-    }
-  });
-}
-
-/* =====================================================================
-   THEME SYSTEM (dark/light mode + accent hue)
-   ===================================================================== */
-function initTheme(){
-  const savedMode = localStorage.getItem(THEME_MODE_KEY);
-  if(savedMode === "light") document.body.classList.add("theme-light");
-
-  const savedAccent = localStorage.getItem(THEME_ACCENT_KEY) || "marvel";
-  if(savedAccent !== "marvel") document.body.setAttribute("data-accent", savedAccent);
-
-  document.getElementById("themeToggle").addEventListener("click", () => {
-    document.body.classList.toggle("theme-light");
-    localStorage.setItem(THEME_MODE_KEY, document.body.classList.contains("theme-light") ? "light" : "dark");
-  });
-
-  const paletteToggle = document.getElementById("paletteToggle");
-  const themeDropdown = document.getElementById("themeDropdown");
-  paletteToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    themeDropdown.classList.toggle("open");
-  });
-  document.addEventListener("click", () => themeDropdown.classList.remove("open"));
-
-  document.querySelectorAll(".theme-option").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const accent = btn.dataset.accent;
-      if(accent === "marvel") document.body.removeAttribute("data-accent");
-      else document.body.setAttribute("data-accent", accent);
-      localStorage.setItem(THEME_ACCENT_KEY, accent);
-      themeDropdown.classList.remove("open");
-    });
-  });
-}
-
-/* =====================================================================
-   CINEMATIC PARTICLES (abstract dots/motes — no logos or IP artwork)
-   ===================================================================== */
-function initParticles(){
-  const container = document.getElementById("heroParticles");
-  const count = window.innerWidth < 700 ? 14 : 26;
-  for(let i=0;i<count;i++){
-    const p = document.createElement("span");
-    p.className = "particle";
-    const size = 2 + Math.random() * 3;
-    p.style.width = size + "px";
-    p.style.height = size + "px";
-    p.style.left = Math.random() * 100 + "%";
-    p.style.top = 60 + Math.random() * 35 + "%";
-    p.style.animationDuration = (6 + Math.random() * 8) + "s";
-    p.style.animationDelay = (Math.random() * 8) + "s";
-    container.appendChild(p);
-  }
-}
-
-/* =====================================================================
-   NAVBAR
+   NAVBAR — sticky state, mobile menu, search toggle
    ===================================================================== */
 function initNavbar(){
   const navbar = document.getElementById("navbar");
@@ -1854,7 +1275,9 @@ function initNavbar(){
   hamburger.addEventListener("click", () => {
     navbar.classList.toggle("menu-open");
     hamburger.classList.toggle("active");
+    hamburger.setAttribute("aria-expanded", String(navbar.classList.contains("menu-open")));
   });
+
   document.querySelectorAll(".nav-links a").forEach(link => {
     link.addEventListener("click", () => {
       navbar.classList.remove("menu-open");
@@ -1866,7 +1289,27 @@ function initNavbar(){
   const navbarSearch = document.getElementById("navbarSearch");
   searchToggle.addEventListener("click", () => {
     navbarSearch.classList.toggle("open");
-    if(navbarSearch.classList.contains("open")) document.getElementById("navSearchInput").focus();
+    const isOpen = navbarSearch.classList.contains("open");
+    searchToggle.setAttribute("aria-expanded", String(isOpen));
+    if(isOpen){
+      document.getElementById("navSearchInput").focus();
+    }
+  });
+}
+
+/* =====================================================================
+   THEME TOGGLE (Dark / Cinema Light)
+   ===================================================================== */
+function initTheme(){
+  const saved = localStorage.getItem(THEME_KEY);
+  if(saved === "light"){
+    document.body.classList.add("theme-light");
+  }
+
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    document.body.classList.toggle("theme-light");
+    const isLight = document.body.classList.contains("theme-light");
+    localStorage.setItem(THEME_KEY, isLight ? "light" : "dark");
   });
 }
 
@@ -1896,7 +1339,9 @@ function initScrollTop(){
   window.addEventListener("scroll", () => {
     btn.classList.toggle("visible", window.scrollY > 500);
   });
-  btn.addEventListener("click", () => window.scrollTo({ top:0, behavior:"smooth" }));
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top:0, behavior:"smooth" });
+  });
 }
 
 /* =====================================================================
@@ -1906,6 +1351,7 @@ function initLoadingScreen(){
   const screen = document.getElementById("loadingScreen");
   const fill = document.getElementById("loadingBarFill");
   let progress = 0;
+
   const interval = setInterval(() => {
     progress = Math.min(progress + Math.random() * 22, 100);
     fill.style.width = progress + "%";
@@ -1927,8 +1373,6 @@ function init(){
   initFilters();
   initNavbar();
   initTheme();
-  initModal();
-  initParticles();
   initScrollTop();
   initScrollReveal();
   initLoadingScreen();
