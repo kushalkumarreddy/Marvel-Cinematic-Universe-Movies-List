@@ -632,3 +632,336 @@ body.theme-light .navbar.scrolled{ background:rgba(255,255,255,0.75); box-shadow
   max-height:0;
   overflow:hidden;
   transition:max-height 380ms var(--ease), padding var(--transition-med);
+  padding:0 22px;
+}
+.card.is-expanded .card-desc-wrap{
+  max-height:160px;
+  padding:0 22px 20px;
+}
+.card-desc{
+  font-size:13px;
+  line-height:1.65;
+  color:var(--text-secondary);
+  padding-top:14px;
+  border-top:1px solid var(--line-soft);
+  max-width:640px;
+}
+
+.watch-btn{
+  flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:11px 18px;
+  border:1.5px solid var(--border-color);
+  border-radius:var(--radius-sm);
+  font-size:11.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+  color:var(--text-primary);
+  transition:all var(--transition-fast);
+  white-space:nowrap;
+}
+.watch-btn svg{ width:14px; height:14px; opacity:0; transition:opacity var(--transition-fast); flex-shrink:0; }
+.watch-btn:hover{ border-color:var(--marvel-red); color:var(--marvel-red); }
+.watch-btn.watched{
+  background:var(--marvel-red); border-color:var(--marvel-red); color:#fff;
+}
+.watch-btn.watched svg{ opacity:1; }
+
+/* =====================================================================
+   13. EMPTY STATE
+   ===================================================================== */
+.empty-state{
+  text-align:center; color:var(--text-secondary); font-family:var(--font-mono);
+  font-size:13px; padding:40px 0;
+}
+
+/* =====================================================================
+   14. FOOTER
+   ===================================================================== */
+.site-footer{ border-top:1px solid var(--border-color); padding:50px 0; }
+.footer-inner{ display:flex; flex-direction:column; gap:14px; align-items:flex-start; }
+.footer-brand{ margin-bottom:4px; }
+.footer-note{ color:var(--text-secondary); font-size:13px; max-width:520px; line-height:1.6; }
+.footer-copy{ color:var(--gray-500); font-size:11.5px; font-family:var(--font-mono); }
+
+/* =====================================================================
+   15. SCROLL TO TOP
+   ===================================================================== */
+.scroll-top{
+  position:fixed; bottom:26px; right:26px; z-index:900;
+  width:46px; height:46px; border-radius:50%;
+  background:var(--marvel-red); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden; transform:translateY(10px);
+  transition:opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+  box-shadow:0 10px 26px -10px rgba(237,29,36,0.6);
+}
+.scroll-top.visible{ opacity:1; visibility:visible; transform:translateY(0); }
+.scroll-top svg{ width:18px; height:18px; }
+
+/* =====================================================================
+   16. RESPONSIVE
+   ===================================================================== */
+@media (max-width:900px){
+  .dashboard-grid{ grid-template-columns:repeat(2, 1fr); }
+  .nav-links{ display:none; }
+  .hamburger{ display:flex; }
+
+  .navbar.menu-open .nav-links{
+    display:flex; flex-direction:column; align-items:flex-start; gap:0;
+    position:absolute; top:var(--nav-height); left:0; right:0;
+    background:var(--bg); border-bottom:1px solid var(--border-color);
+    padding:8px 24px 18px;
+  }
+  .navbar.menu-open .nav-links a{ width:100%; padding:12px 0; border-bottom:1px solid var(--line-soft); }
+}
+
+@media (max-width:640px){
+  .dashboard-grid{ grid-template-columns:1fr 1fr; }
+  .hero-actions{ flex-direction:column; width:100%; }
+  .btn{ width:100%; }
+  .filters-bar{ flex-direction:column; align-items:stretch; }
+  .filter-field select{ width:100%; }
+
+  .card-row{ flex-wrap:wrap; padding:16px 18px; }
+  .card-index{ text-align:left; min-width:auto; order:1; }
+  .card-main{ order:2; width:100%; }
+  .card-chevron{ order:3; }
+  .watch-btn{ order:4; width:100%; margin-top:4px; }
+  .card-desc{ padding-left:0; }
+
+  .continue-card{ flex-direction:column; align-items:stretch; }
+  .continue-card .btn{ width:100%; }
+  .phase-progress-track{ max-width:none; width:100%; order:5; }
+  .data-actions{ flex-direction:column; }
+  .data-actions .btn-ghost{ width:100%; }
+}
+
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<noscript>
+  <style>.loading-screen{ display:none !important; }</style>
+</noscript>
+
+<!-- ============================= -->
+<!-- LOADING SCREEN                -->
+<!-- ============================= -->
+<div class="loading-screen" id="loadingScreen" aria-hidden="true">
+  <div class="loading-mark">MCU</div>
+  <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+  <div class="loading-label">Loading archive</div>
+</div>
+
+<!-- ============================= -->
+<!-- NAVBAR                        -->
+<!-- ============================= -->
+<header class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="#home" class="brand">
+      <span class="brand-mark">MCU</span>
+      <span class="brand-text">Archive</span>
+    </a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">Home</a>
+      <a href="#dashboard">Progress</a>
+      <a href="#timeline">Timeline</a>
+    </nav>
+
+    <div class="navbar-actions">
+      <button class="icon-btn" id="searchToggle" aria-label="Search titles" aria-expanded="false" aria-controls="navbarSearch">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" id="themeIcon" aria-hidden="true"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/><line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="navbar-search" id="navbarSearch">
+    <input type="text" id="navSearchInput" placeholder="Search the archive…" autocomplete="off">
+  </div>
+
+  <div class="mini-progress" aria-hidden="true">
+    <div class="mini-progress-fill" id="miniProgressFill"></div>
+  </div>
+</header>
+
+<main id="main-content">
+
+<!-- ============================= -->
+<!-- HERO                          -->
+<!-- ============================= -->
+<section class="hero" id="home">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-grid"></div>
+    <div class="hero-sweep"></div>
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal" data-reveal>Every Story · One Chronology</p>
+    <h1 class="hero-title reveal" data-reveal>
+      <span class="hero-title-line">MARVEL</span>
+      <span class="hero-title-line hero-title-accent">CINEMATIC UNIVERSE</span>
+    </h1>
+    <p class="hero-subtitle reveal" data-reveal>
+      The complete archive of the MCU — every film, series, and special presentation,
+      organized in exact release order and ready to track from Phase One to the Multiverse Saga.
+    </p>
+    <div class="hero-actions reveal" data-reveal>
+      <a href="#timeline" class="btn btn-primary">Browse the Timeline</a>
+      <a href="#dashboard" class="btn btn-outline">View My Progress</a>
+    </div>
+  </div>
+
+  <a href="#dashboard" class="scroll-indicator" aria-label="Scroll down">
+    <span></span>
+  </a>
+</section>
+
+<!-- ============================= -->
+<!-- WATCH PROGRESS DASHBOARD      -->
+<!-- ============================= -->
+<section class="dashboard" id="dashboard">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal" data-reveal>Your Archive Status</p>
+    <h2 class="section-title reveal" data-reveal>Watch Progress</h2>
+
+    <div class="dashboard-grid reveal" data-reveal>
+      <div class="stat-card">
+        <span class="stat-label">Total Titles</span>
+        <span class="stat-value" id="statTotal">0</span>
+      </div>
+      <div class="stat-card stat-card-accent">
+        <span class="stat-label">Watched</span>
+        <span class="stat-value" id="statWatched">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Remaining</span>
+        <span class="stat-value" id="statRemaining">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Completion</span>
+        <span class="stat-value" id="statPercent">0%</span>
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap reveal" data-reveal>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </div>
+
+    <div class="continue-card reveal" data-reveal id="continueCard" hidden>
+      <div>
+        <p class="continue-card-label">Continue Watching</p>
+        <h3 class="continue-card-title" id="continueTitle">—</h3>
+        <p class="continue-card-meta" id="continueMeta">—</p>
+      </div>
+      <a href="#timeline" class="btn btn-outline" id="continueLink">Jump to Title</a>
+    </div>
+
+    <div class="continue-card reveal" data-reveal id="allWatchedCard" hidden>
+      <div class="continue-card-done">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 12L13 4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>You're fully caught up — every title in the archive is marked watched.</span>
+      </div>
+    </div>
+
+    <div class="data-actions reveal" data-reveal>
+      <button class="btn btn-ghost" id="exportData">Export Progress</button>
+      <button class="btn btn-ghost" id="importDataBtn">Import Progress</button>
+      <input type="file" id="importDataInput" accept="application/json" hidden>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- FILTERS / SEARCH              -->
+<!-- ============================= -->
+<section class="filters" id="filtersSection">
+  <div class="section-inner">
+    <div class="filters-bar reveal" data-reveal>
+      <div class="filter-field filter-search">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by title…" autocomplete="off">
+      </div>
+
+      <div class="filter-field">
+        <label for="phaseFilter">Phase</label>
+        <select id="phaseFilter">
+          <option value="all">All Phases</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="categoryFilter">Category</label>
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="movie">Movies</option>
+          <option value="series">Disney+ Series</option>
+          <option value="special">Special Presentations</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="sortFilter">Sort</label>
+        <select id="sortFilter">
+          <option value="asc">Release Date ↑</option>
+          <option value="desc">Release Date ↓</option>
+        </select>
+      </div>
+
+      <button class="btn btn-ghost" id="resetFilters">Reset Filters</button>
+    </div>
+
+    <p class="filters-meta" id="resultsMeta"></p>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- TIMELINE                      -->
+<!-- ============================= -->
+<section class="timeline-section" id="timeline">
+  <div class="section-inner">
+    <p class="section-eyebrow reveal" data-reveal>Phase One — The Multiverse Saga</p>
+    <h2 class="section-title reveal" data-reveal>The Full Chronology</h2>
+  </div>
+
+  <div class="timeline-container" id="timelineContainer">
+    <!-- Populated by script.js -->
+  </div>
+
+  <p class="empty-state" id="emptyState" hidden>No titles match your filters. Try resetting them.</p>
+</section>
+
+</main>
+
+<!-- ============================= -->
+<!-- FOOTER                        -->
+<!-- ============================= -->
+<footer class="site-footer">
+  <div class="section-inner footer-inner">
+    <div class="brand footer-brand">
+      <span class="brand-mark">MCU</span>
+      <span class="brand-text">Archive</span>
+    </div>
+    <p class="footer-note">An unofficial fan-made archive and watch tracker. Not affiliated with or endorsed by Marvel Studios or The Walt Disney Company.</p>
+    <p class="footer-copy">Built with HTML, CSS &amp; JavaScript — progress stored locally in your browser.</p>
+  </div>
+</footer>
+
+<!-- ============================= -->
+<!-- SCROLL TO TOP                 -->
+<!-- ============================= -->
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="5 12 12 5 19 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<script>
